@@ -2,59 +2,70 @@ import sys, pygame
 from sprites import Block, Avatar
 pygame.init()
 
-bg_file = 'landscape.bmp'
-avatar_file = 'avatar.bmp'
-block_file = 'ice.bmp'
+def main(argv=None):
+  """ main game loop """
+  if argv is None:
+    argv = sys.argv
 
-# window
-size = width, height = 640, 480
-speed = [2, 2]
-rects = []
+  resource_folder = 'resources/'
+  bg_file = resource_folder + 'landscape.bmp'
+  avatar_file = resource_folder + 'avatar.bmp'
+  block_file = resource_folder + 'ice.bmp'
+  COLORKEY = 0xff00ff         # transparent color
 
-screen = pygame.display.set_mode(size)
+  # GUI window
+  size = width, height = 640, 480
+  screen = pygame.display.set_mode(size)
 
-# keyboard
-pygame.key.set_repeat(10, 10)
+  # keyboard delay before key repeats
+  pygame.key.set_repeat(10, 10)
 
-# load and set up background
-bg = pygame.image.load(bg_file).convert()
-bg_rect = bg.get_rect()
-rects.append(bg_rect)
+  # load and set up background
+  bg = pygame.image.load(bg_file).convert()
+  bg_rect = bg.get_rect()
 
-# load and set up avatar
-avatar_surf = pygame.image.load(avatar_file).convert()
-avatar_surf.set_colorkey(0xFF00FF)
-avatar_rect = avatar_surf.get_rect()
-avatar_vel = 10
-avatar = Avatar(avatar_surf,
-    [width/2, height - avatar_rect.height],
-    avatar_vel)
+  # load and set up avatar
+  avatar_surf = pygame.image.load(avatar_file).convert()
+  avatar_surf.set_colorkey(COLORKEY)
+  avatar_rect = avatar_surf.get_rect()
+  avatar_vel = 10
+  avatar = Avatar(avatar_surf,
+      [width/2, height - avatar_rect.height],
+      avatar_vel)
 
-# blocks
-block_surf = pygame.image.load(block_file).convert()
-block_surf.set_colorkey(0xFF00FF)
-b1 = Block(block_surf, [100, 100], 2)
+  # blocks (currently just testing one block)
+  block_surf = pygame.image.load(block_file).convert()
+  block_surf.set_colorkey(COLORKEY)
+  b1 = Block(block_surf, [100, 100], 2)
 
-while 1:
-  # keyboard handling
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT: sys.exit()
-    elif event.type == pygame.KEYDOWN:
-      if event.key == pygame.K_LEFT:
-        if not avatar.too_left():
-          avatar.update(-1)
-      elif event.key == pygame.K_RIGHT:
-        if not avatar.too_right(width):
-          avatar.update(1)
-      elif event.key == pygame.K_ESCAPE:
-        sys.exit()
+  while 1:
+    # input handling
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT: sys.exit()
+      elif event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_LEFT:
+          if not avatar.too_left():
+            avatar.update(-1)
+        elif event.key == pygame.K_RIGHT:
+          if not avatar.too_right(width):
+            avatar.update(1)
+        elif event.key == pygame.K_ESCAPE:
+          sys.exit()
 
-  if not b1.on_ground(height):
-    b1.update()
+    # update state
+    if not b1.on_ground(height):
+      b1.update()
 
-  screen.blit(bg, bg_rect)
-  screen.blit(avatar.image, avatar.rect)
-  screen.blit(b1.image, b1.rect)
-  pygame.display.flip()
-  #pygame.time.delay(10)
+    # calculate state conditions
+
+
+    # redraw
+    screen.blit(bg, bg_rect)
+    screen.blit(avatar.image, avatar.rect)
+    screen.blit(b1.image, b1.rect)
+    pygame.display.flip()
+    #pygame.time.delay(10)
+
+if __name__ == "__main__":
+    sys.exit(main())
 
