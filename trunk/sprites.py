@@ -9,6 +9,11 @@ class Avatar(pygame.sprite.Sprite):
     self.vel = vel
 
   def update(self, dir):
+    """
+    If dir > 0, move avatar right by self.vel pixels.
+    If dir < 0, move avatar left.
+    """
+    
     if dir > 0:
       self.rect = self.rect.move(self.vel, 0)
     else:
@@ -18,21 +23,18 @@ class Avatar(pygame.sprite.Sprite):
     self.vel = vel
 
   def valid_pos(self, width):
-    if self.rect.left < 0 or self.rect.right > width + self.rect.width:
+    if too_left(self) or too_right(self):
       return False
     return True
 
   def too_left(self):
+    """Returns True if avatar is too far to the left of screen"""
     if self.rect.left <= 0: return True
     return False
  
   def too_right(self, width):
+    """Returns True if avatar is too far to the right of screen"""
     if self.rect.right >= width: return True
-    return False
-
-  def on_ground(self, ground_lvl):
-    if ground_lvl - self.rect.top - self.rect.height == 0:
-      return True
     return False
 
 class Block(pygame.sprite.Sprite):
@@ -44,12 +46,14 @@ class Block(pygame.sprite.Sprite):
     self.vel = vel
 
   def update(self):
+    """moves block down by self.vel pixels"""
     self.rect = self.rect.move(0, self.vel)
 
   def set_vel(self, v):
     self.vel = vel
 
   def on_ground(self, ground_lvl):
+    """returns True if block is on the ground"""
     if ground_lvl - self.rect.top - self.rect.height == 0:
       return True
     return False
