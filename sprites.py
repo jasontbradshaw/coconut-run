@@ -38,6 +38,9 @@ class Avatar(pygame.sprite.Sprite):
     return False
 
 class Block(pygame.sprite.Sprite):
+  ground_lvl = 0
+  vel = 0
+
   def __init__(self, surface, initial_position, vel = 0):
     pygame.sprite.Sprite.__init__(self)
     self.image = surface
@@ -47,13 +50,13 @@ class Block(pygame.sprite.Sprite):
 
   def update(self):
     """moves block down by self.vel pixels"""
-    self.rect = self.rect.move(0, self.vel)
+    if not on_ground(self):
+      self.rect = self.rect.move(0, self.vel)
 
-  def set_vel(self, v):
-    self.vel = vel
-
-  def on_ground(self, ground_lvl):
+  def on_ground(self):
     """returns True if block is on the ground"""
-    if ground_lvl - self.rect.top - self.rect.height == 0:
+    if self.ground_lvl - self.rect.top - self.rect.height == 0:
       return True
     return False
+
+

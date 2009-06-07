@@ -36,7 +36,9 @@ def main(argv=None):
   # blocks (currently just testing one block)
   block_surf = pygame.image.load(block_file).convert()
   block_surf.set_colorkey(COLORKEY)
-  b1 = Block(block_surf, [100, 100], 2)
+  blocks = pygame.sprite.Group()
+  blocks.add(Block(block_surf, [100, 0], 2))
+  blocks.add(Block(block_surf, [400, 0], 4))
 
   while 1:
     # input handling
@@ -52,12 +54,13 @@ def main(argv=None):
         elif event.key == pygame.K_ESCAPE:
           sys.exit()
 
-    # update state
+    # update sprites
     if not b1.on_ground(height):
       b1.update()
 
     # calculate state conditions
 
+    # update game state
 
     # redraw
     screen.blit(bg, bg_rect)
