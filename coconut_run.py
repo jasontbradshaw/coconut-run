@@ -37,8 +37,9 @@ def main(argv=None):
   block_surf = pygame.image.load(block_file).convert()
   block_surf.set_colorkey(COLORKEY)
   blocks = pygame.sprite.Group()
-  blocks.add(Block(block_surf, [100, 0], 2))
-  blocks.add(Block(block_surf, [400, 0], 4))
+  # make some test blocks
+  blocks.add(Block(block_surf, [100, 0], 2, height))
+  blocks.add(Block(block_surf, [400, 0], 4, height))
 
   while 1:
     # input handling
@@ -55,8 +56,7 @@ def main(argv=None):
           sys.exit()
 
     # update sprites
-    if not b1.on_ground(height):
-      b1.update()
+    blocks.update() 
 
     # calculate state conditions
 
@@ -65,7 +65,8 @@ def main(argv=None):
     # redraw
     screen.blit(bg, bg_rect)
     screen.blit(avatar.image, avatar.rect)
-    screen.blit(b1.image, b1.rect)
+    for b in blocks:
+      screen.blit(b.image, b.rect)
     pygame.display.flip()
     #pygame.time.delay(10)
 
