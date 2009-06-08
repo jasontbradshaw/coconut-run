@@ -1,0 +1,20 @@
+#summary battle plan.
+#labels Phase-Requirements
+
+= Milestone 1 =
+
+A rudimentary _playable_ version with crappy graphics and no interface. Basically, we should be able to:
+
+ * run `$ python coconut_run.py`
+ * see menu screen; hit button to play
+ * dodge coconuts
+  * input --> change state --> output loop
+  * collision detection
+ * lose lives
+ * exit game when lives <= 0
+
+= Milestone 2 =
+
+Add fundamental features to the game play.
+
+ * scoring system
