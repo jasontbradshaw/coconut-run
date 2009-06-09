@@ -19,23 +19,11 @@ class Avatar(pygame.sprite.Sprite):
         else:
             self.rect = self.rect.move(-self.vel, 0)
 
-    def set_vel(self, v):
-        self.vel = vel
+    def left_pos(self):
+        return self.rect.left
 
-    def valid_pos(self, width):
-        if too_left(self) or too_right(self):
-            return False
-        return True
-
-    def too_left(self):
-        """Returns True if avatar is too far to the left of screen"""
-        if self.rect.left <= 0: return True
-        return False
- 
-    def too_right(self, width):
-        """Returns True if avatar is too far to the right of screen"""
-        if self.rect.right >= width: return True
-        return False
+    def right_pos(self):
+        return self.rect.left + self.rect.width
 
 class Block(pygame.sprite.Sprite):
 
