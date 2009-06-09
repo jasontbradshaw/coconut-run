@@ -1,6 +1,12 @@
-import sys, pygame
-from sprites import Block, Avatar
-from game import Game, Level
+import sys
+import pygame
+import random
+
+from sprites import Block
+from sprites import Avatar
+from game import Game
+from game import Level
+
 pygame.init()
 
 def main(argv=None):
@@ -27,7 +33,7 @@ def main(argv=None):
     avatar_surf = pygame.image.load(avatar_file).convert()
     avatar_surf.set_colorkey(COLORKEY)
     avatar_rect = avatar_surf.get_rect()
-    avatar_vel = 10
+    avatar_vel = 4
     avatar = Avatar(avatar_surf,
             [width/2, height - avatar_rect.height],
             avatar_vel)
@@ -53,6 +59,10 @@ def main(argv=None):
                         avatar.update(1)
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
+        #block creation
+        blockFreq = 0.001 # how often we want blocks to fall as chance per frame
+        if random.random() < blockFreq:
+            blocks.add(Block(block_surf, [random.randint(0, width), 0], 1, height))
 
         # update sprites
         blocks.update() 
