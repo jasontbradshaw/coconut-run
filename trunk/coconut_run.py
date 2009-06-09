@@ -1,5 +1,6 @@
 import sys, pygame
 from sprites import Block, Avatar
+from game import Game, Level
 pygame.init()
 
 def main(argv=None):
@@ -8,7 +9,6 @@ def main(argv=None):
         argv = sys.argv
 
     resource_folder = 'resources/'
-    bg_file = resource_folder + 'landscape.bmp'
     avatar_file = resource_folder + 'avatar.bmp'
     block_file = resource_folder + 'ice.bmp'
     COLORKEY = 0xff00ff                 # transparent color
@@ -20,9 +20,8 @@ def main(argv=None):
     # keyboard delay before key repeats
     pygame.key.set_repeat(10, 10)
 
-    # load and set up background
-    bg = pygame.image.load(bg_file).convert()
-    bg_rect = bg.get_rect()
+    # load level
+    lvl = Level()
 
     # load and set up avatar
     avatar_surf = pygame.image.load(avatar_file).convert()
@@ -47,10 +46,10 @@ def main(argv=None):
             if event.type == pygame.QUIT: sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    if not avatar.too_left():
+                    if avatar.left_pos() > lvl.left_cutoff:
                         avatar.update(-1)
                 elif event.key == pygame.K_RIGHT:
-                    if not avatar.too_right(width):
+                    if avatar.right_pos() < lvl.right_cutoff:
                         avatar.update(1)
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
@@ -63,7 +62,7 @@ def main(argv=None):
         # update game state
 
         # redraw
-        screen.blit(bg, bg_rect)
+        screen.blit(lvl.bg_image, lvl.bg_rect)
         screen.blit(avatar.image, avatar.rect)
         for b in blocks:
             screen.blit(b.image, b.rect)
