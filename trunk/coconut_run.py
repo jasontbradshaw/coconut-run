@@ -27,7 +27,7 @@ def main(argv=None):
     pygame.key.set_repeat(10, 10)
 
     # load level
-    lvl = Level()
+    lvl = Level("Level 1", "landscape.bmp", 120, -1, 1, 3, 0, 0, width, height)
 
     # load and set up avatar
     avatar_surf = pygame.image.load(avatar_file).convert()
@@ -35,17 +35,14 @@ def main(argv=None):
     avatar_rect = avatar_surf.get_rect()
     avatar_vel = 4
     avatar = Avatar(avatar_surf,
-            [width/2, height - avatar_rect.height],
-            avatar_vel)
+                    [lvl.right/2, lvl.bottom - avatar_rect.height],
+                    avatar_vel)
 
-    # blocks (currently just testing one block)
+    # blocks
     block_surf = pygame.image.load(block_file).convert()
     block_surf.set_colorkey(COLORKEY)
     blocks = pygame.sprite.Group()
-    # make some test blocks
-    blocks.add(Block(block_surf, [100, 0], 2, height))
-    blocks.add(Block(block_surf, [400, 0], 4, height))
-
+    
     while 1:
         # input handling
         for event in pygame.event.get():
@@ -60,9 +57,11 @@ def main(argv=None):
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
         #block creation
-        blockFreq = 0.001 # how often we want blocks to fall as chance per frame
+        blockFreq = 0.002 # how often we want blocks to fall as chance per frame
         if random.random() < blockFreq:
-            blocks.add(Block(block_surf, [random.randint(0, width), 0], 1, height))
+            blocks.add(Block(block_surf,
+                             [random.randint(lvl.left, lvl.right), lvl.top],
+                             random.uniform(lvl.min_vel, lvl.max_vel), lvl.top))
 
         # update sprites
         blocks.update() 
