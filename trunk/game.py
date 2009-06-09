@@ -2,7 +2,7 @@ import pygame
 
 class Game:
     """Keeps track of game state."""
-    def __init__(self):
+    def __init__(self, lives = 0, points = 0):
         self.lives = 0
         self.points = 0
 
@@ -19,8 +19,8 @@ class Level:
         
         # level size
         self.left = left
-        self.right = right
         self.top = top
+        self.right = right
         self.bottom = bottom
         
         # build background image and rect
