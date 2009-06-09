@@ -23,6 +23,9 @@ def main(argv=None):
     size = width, height = 640, 480
     screen = pygame.display.set_mode(size)
 
+    # clock, for fps info and timing
+    clk = pygame.time.Clock()
+
     # keyboard delay before key repeats
     pygame.key.set_repeat(10, 10)
 
@@ -75,11 +78,15 @@ def main(argv=None):
 
         # update game state
 
+        # fps (in console)
+        clk.tick() # used by get_fps()
+        #print(clk.get_fps())
+
         # redraw
         screen.blit(lvl.bg_image, lvl.bg_rect)
-        screen.blit(avatar.image, avatar.rect)
         for b in blocks:
             screen.blit(b.image, b.rect)
+        screen.blit(avatar.image, avatar.rect)
         pygame.display.flip()
         #pygame.time.delay(10)
 
