@@ -42,6 +42,8 @@ def main(argv=None):
     block_surf = pygame.image.load(block_file).convert()
     block_surf.set_colorkey(COLORKEY)
     blocks = pygame.sprite.Group()
+    block_freq = 0.002 # how often we want blocks to fall; chance per frame
+    blocks_left = lvl.max_blocks # how many blocks we can still create
     
     while 1:
         # input handling
@@ -49,17 +51,20 @@ def main(argv=None):
             if event.type == pygame.QUIT: sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    if avatar.left_pos() > lvl.left_cutoff:
+                    if avatar.left_pos() > lvl.left:
                         avatar.update(-1)
                 elif event.key == pygame.K_RIGHT:
-                    if avatar.right_pos() < lvl.right_cutoff:
+                    if avatar.right_pos() < lvl.right:
                         avatar.update(1)
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
+        
         #block creation
-        blockFreq = 0.002 # how often we want blocks to fall as chance per frame
-        if random.random() < blockFreq:
-            blocks.add(Block(block_surf,
+        if random.random() < block_freq and blocks_left != 0:
+            # we use != instead of > so when lvl.max_blocks < 0,
+            # we can create blocks indefinitely
+            blocks_left -= 1
+            blocks.add(Block(lvl, block_surf,
                              [random.randint(lvl.left, lvl.right), lvl.top],
                              random.uniform(lvl.min_vel, lvl.max_vel), lvl.top))
 
