@@ -48,6 +48,11 @@ def main(argv=None):
     block_freq = 0.002 # how often we want blocks to fall; chance per frame
     blocks_left = lvl.max_blocks # how many blocks we can still create
     
+    # large game font
+    default_font = pygame.font.Font("resources/fonts/anmari.ttf", 26)
+    COLOR_BLACK = (0, 0, 0)
+    fps_display_pos = (20, 20)
+    
     while 1:
         # input handling
         for event in pygame.event.get():
@@ -78,15 +83,17 @@ def main(argv=None):
 
         # update game state
 
-        # fps (in console)
+        # fps
         clk.tick() # used by get_fps()
-        #print(clk.get_fps())
+        fps = clk.get_fps()
 
         # redraw
         screen.blit(lvl.bg_image, lvl.bg_rect)
         for b in blocks:
             screen.blit(b.image, b.rect)
         screen.blit(avatar.image, avatar.rect)
+        screen.blit(default_font.render('FPS: %.f' % fps, 1, COLOR_BLACK),
+                fps_display_pos)
         pygame.display.flip()
         #pygame.time.delay(10)
 
