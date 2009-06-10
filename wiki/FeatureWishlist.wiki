@@ -1,6 +1,6 @@
-#summary One-sentence summary of this page.
+#summary Features we would like to see and ideas of how to implement them.
 #labels Phase-Design
-Features we would like to see and ideas of how to implement them.
+
 = Introduction =
 <hr>
 Here we will keep a record of features we want/need, and ideas of how to implement them (or at least how to _learn_ how we could implement them).
