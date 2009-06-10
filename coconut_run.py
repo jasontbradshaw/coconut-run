@@ -16,8 +16,8 @@ def main(argv=None):
 
     resource_folder = 'resources/'
     avatar_file = resource_folder + 'avatar.bmp'
-    block_file = resource_folder + 'ice.bmp'
-    COLORKEY = 0xff00ff                 # transparent color
+    block_file = resource_folder + 'coconut.bmp'
+    COLORKEY = 0xFF00FF # transparent color
 
     # GUI window
     size = width, height = 640, 480
@@ -30,7 +30,8 @@ def main(argv=None):
     pygame.key.set_repeat(10, 10)
 
     # load level
-    lvl = Level("Level 1", "landscape.bmp", 120, -1, 1, 3, 0, 0, width, height)
+    lvl = Level("Cocoana", "landscape.bmp", 120, -1, 10, 15,
+                0, 0, width, height)
 
     # load and set up avatar
     avatar_surf = pygame.image.load(avatar_file).convert()
@@ -45,13 +46,15 @@ def main(argv=None):
     block_surf = pygame.image.load(block_file).convert()
     block_surf.set_colorkey(COLORKEY)
     blocks = pygame.sprite.Group()
-    block_freq = 0.002 # how often we want blocks to fall; chance per frame
+    block_freq = 0.02 # how often we want blocks to fall; chance per frame
     blocks_left = lvl.max_blocks # how many blocks we can still create
     
     # large game font
     default_font = pygame.font.Font("resources/fonts/anmari.ttf", 26)
     COLOR_BLACK = (0, 0, 0)
+    COLOR_WHITE = (255, 255, 255)
     fps_display_pos = (20, 20)
+    level_display_pos = (lvl.right / 2 - 50, 20)
     
     while 1:
         # input handling
@@ -61,9 +64,13 @@ def main(argv=None):
                 if event.key == pygame.K_LEFT:
                     if avatar.left_pos() > lvl.left:
                         avatar.update(-1)
+                        avatar.image = pygame.transform.flip(avatar.image,
+                                                             True, False)
                 elif event.key == pygame.K_RIGHT:
                     if avatar.right_pos() < lvl.right:
                         avatar.update(1)
+                        avatar.image = pygame.transform.flip(avatar.image,
+                                                             True, False)
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
         
@@ -72,9 +79,10 @@ def main(argv=None):
             # we use != instead of > so when lvl.max_blocks < 0,
             # we can create blocks indefinitely
             blocks_left -= 1
-            blocks.add(Block(lvl, block_surf,
+            blocks.add(Block(block_surf,
                              [random.randint(lvl.left, lvl.right), lvl.top],
-                             random.uniform(lvl.min_vel, lvl.max_vel), lvl.top))
+                             random.uniform(lvl.min_vel, lvl.max_vel),
+                             lvl.bottom))
 
         # update sprites
         blocks.update() 
@@ -84,7 +92,7 @@ def main(argv=None):
         # update game state
 
         # fps
-        clk.tick() # used by get_fps()
+        clk.tick(60) # used by get_fps(), limits framerate (a 'hack' for now)
         fps = clk.get_fps()
 
         # redraw
@@ -92,6 +100,8 @@ def main(argv=None):
         for b in blocks:
             screen.blit(b.image, b.rect)
         screen.blit(avatar.image, avatar.rect)
+        screen.blit(default_font.render(lvl.name, 1, COLOR_WHITE),
+                level_display_pos)
         screen.blit(default_font.render('FPS: %.f' % fps, 1, COLOR_BLACK),
                 fps_display_pos)
         pygame.display.flip()
