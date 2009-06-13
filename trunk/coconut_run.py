@@ -7,8 +7,6 @@ from sprites import Avatar
 from game import Game
 from game import Level
 
-pygame.init()
-
 def main(argv=None):
     """ main game loop """
     if argv is None:
@@ -57,6 +55,7 @@ def main(argv=None):
     level_display_pos = (lvl.right / 2 - 50, 20)
     lives_display_pos = (20, 20)
 
+    menu(screen)
     while 1:
         # input handling
         for event in pygame.event.get():
@@ -117,6 +116,23 @@ def main(argv=None):
         pygame.display.flip()
         #pygame.time.delay(10)
 
+def menu(screen):
+    menu_surf = pygame.image.load("resources/main_menu.png").convert()
+    menu_rect = menu_surf.get_rect()
+    start_game = False
+    while not start_game:
+        # input handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    start_game = True
+                elif event.key == pygame.K_ESCAPE:
+                    sys.exit()
+        screen.blit(menu_surf, menu_rect)
+        pygame.display.flip()
+
 if __name__ == "__main__":
-        sys.exit(main())
+    pygame.init()
+    sys.exit(main())
 
