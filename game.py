@@ -3,8 +3,8 @@ import pygame
 class Game:
     """Keeps track of game state."""
     def __init__(self, lives = 0, points = 0):
-        self.lives = 0
-        self.points = 0
+        self.lives = lives
+        self.points = points
 
 class Level:
     """Defines level settings such as difficulty."""

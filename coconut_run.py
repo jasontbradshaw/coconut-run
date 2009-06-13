@@ -40,7 +40,7 @@ def main(argv=None):
     avatar_vel = 4
     avatar = Avatar(avatar_surf,
                     [lvl.right/2, lvl.bottom - avatar_rect.height],
-                    avatar_vel)
+                    avatar_vel, 10, 0)
 
     # blocks
     block_surf = pygame.image.load(block_file).convert()
@@ -53,9 +53,10 @@ def main(argv=None):
     default_font = pygame.font.Font("resources/fonts/anmari.ttf", 26)
     COLOR_BLACK = (0, 0, 0)
     COLOR_WHITE = (255, 255, 255)
-    fps_display_pos = (20, 20)
+    fps_display_pos = (lvl.right - 140, 20)
     level_display_pos = (lvl.right / 2 - 50, 20)
-    
+    lives_display_pos = (20, 20)
+
     while 1:
         # input handling
         for event in pygame.event.get():
@@ -89,6 +90,13 @@ def main(argv=None):
 
         # calculate state conditions
 
+        # collision detection
+        collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
+        for c in collide_list:
+            if c.collidable(avatar):
+                avatar.lives -= 1
+                c.collided = True   # each block can only collide once
+
         # update game state
 
         # fps
@@ -104,6 +112,8 @@ def main(argv=None):
                 level_display_pos)
         screen.blit(default_font.render('FPS: %.f' % fps, 1, COLOR_BLACK),
                 fps_display_pos)
+        screen.blit(default_font.render('Lives: %d' % avatar.lives, 1, COLOR_BLACK),
+                lives_display_pos)
         pygame.display.flip()
         #pygame.time.delay(10)
 
