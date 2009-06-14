@@ -31,8 +31,10 @@ def main(argv=None):
     pygame.key.set_repeat(10, 10)
 
     # load level
-    lvl = Level("Cocoana", "landscape.bmp", 120, -1, 10, 15,
-                0, 0, width, height)
+    lvl = Level("Cocoana", "landscape.bmp",
+            120, 0.015, 0.00001,
+            10, 15,
+            0, 0, width, height - 40)
 
     # load and initialize avatar
     avatar_surf = pygame.image.load(avatar_file).convert()
@@ -47,9 +49,6 @@ def main(argv=None):
     block_surf = pygame.image.load(block_file).convert()
     block_surf.set_colorkey(COLORKEY)
     blocks = pygame.sprite.Group()
-    block_freq = 0.015 # how often we want blocks to fall; chance per frame
-    block_increase = 0.00001 # how quickly the difficulty ramps up
-    blocks_left = lvl.max_blocks # how many blocks we can still create
     
     # text
     default_font = pygame.font.Font(resource_folder + fonts_folder +
@@ -65,6 +64,31 @@ def main(argv=None):
 
     # main loop
     while not game_over:
+
+        # fps
+        clk.tick(global_fps) # limits framerate (a 'hack' for now)
+        fps = clk.get_fps()
+
+        # draw sprites
+        screen.blit(lvl.bg_image, lvl.bg_rect)
+        for b in blocks:
+            screen.blit(b.image, b.rect)
+        screen.blit(avatar.image, avatar.rect)
+
+        # draw text
+        screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
+                level_display_pos)
+        screen.blit(default_font.render('FPS: %.1f' % fps, 1, COLOR_BLACK),
+                fps_display_pos)
+        screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
+                                        COLOR_BLACK), lives_display_pos)
+        screen.blit(default_font.render('Points: %d' % avatar.points, 1,
+                                        COLOR_BLACK), points_display_pos)
+        # draw debug text
+        screen.blit(default_font.render('block_freq: %f' % lvl.block_freq, 1,
+                                        COLOR_BLACK), (20, 80))
+        pygame.display.flip()
+
         # input handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
@@ -82,11 +106,8 @@ def main(argv=None):
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
         
-        #block creation
-        if random.random() < block_freq and blocks_left != 0:
-            # we use != instead of > so when lvl.max_blocks < 0,
-            # we can create blocks indefinitely
-            blocks_left -= 1
+        # block creation
+        if random.random() < lvl.block_freq:
             blocks.add(Block(block_surf,
                              [random.randint(lvl.left, lvl.right), lvl.top],
                              random.uniform(lvl.min_vel, lvl.max_vel),
@@ -97,7 +118,7 @@ def main(argv=None):
 
         # calculate state conditions
         avatar.points += 1
-        block_freq += block_increase
+        lvl.block_freq += lvl.block_freq_inc
         
         # collision detection
         collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
@@ -106,38 +127,12 @@ def main(argv=None):
                 if avatar.lives > 0:
                     avatar.lives -= 1
                 else:
+                    # go to game over screen and quit
                     full_screen_image(resource_folder + "game_over.png")
                     game_over = True
                 c.collided = True   # each block can only collide once
 
         # update game state
-
-        # fps
-        clk.tick(global_fps) # TODO: used by get_fps(),
-                             # limits framerate (a 'hack' for now)
-        fps = clk.get_fps()
-
-        # redraw
-        # sprites
-        screen.blit(lvl.bg_image, lvl.bg_rect)
-        for b in blocks:
-            screen.blit(b.image, b.rect)
-        screen.blit(avatar.image, avatar.rect)
-
-        # text
-        screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
-                level_display_pos)
-        screen.blit(default_font.render('FPS: %.1f' % fps, 1, COLOR_BLACK),
-                fps_display_pos)
-        screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
-                                        COLOR_BLACK), lives_display_pos)
-        screen.blit(default_font.render('Points: %d' % avatar.points, 1,
-                                        COLOR_BLACK), points_display_pos)
-        # debug text
-        screen.blit(default_font.render('block_freq: %f' % block_freq, 1,
-                                        COLOR_BLACK), (20, 80))
-        
-        pygame.display.flip()
 
 def full_screen_image(img_filename):
     menu_surf = pygame.image.load(img_filename).convert()
