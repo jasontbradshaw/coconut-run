@@ -46,7 +46,7 @@ class Block(pygame.sprite.Sprite):
         """moves block down by self.vel pixels"""
         if not self.on_ground():
             self.rect = self.rect.move(0, self.vel)
-        elif not self.hit_ground:
+        elif not self.hit_ground:   # has hit ground but flag not set
             # start timeout count down before killing sprite
             self.hit_ground = True
             self.time_hit_ground = pygame.time.get_ticks()
