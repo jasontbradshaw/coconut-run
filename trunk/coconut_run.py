@@ -7,6 +7,11 @@ from sprites import Avatar
 from game import Game
 from game import Level
 
+global_fps = 60
+# GUI window
+size = width, height = 640, 480
+screen = pygame.display.set_mode(size)
+
 def main(argv=None):
     """ main game loop """
     if argv is None:
@@ -17,9 +22,6 @@ def main(argv=None):
     block_file = resource_folder + 'coconut.bmp'
     COLORKEY = 0xFF00FF # transparent color
 
-    # GUI window
-    size = width, height = 640, 480
-    screen = pygame.display.set_mode(size)
 
     # clock, for fps info and timing
     clk = pygame.time.Clock()
@@ -38,7 +40,7 @@ def main(argv=None):
     avatar_vel = 4
     avatar = Avatar(avatar_surf,
                     [lvl.right/2, lvl.bottom - avatar_rect.height],
-                    avatar_vel, 10, 0)
+                    avatar_vel, 3, 0)
 
     # blocks
     block_surf = pygame.image.load(block_file).convert()
@@ -55,8 +57,9 @@ def main(argv=None):
     level_display_pos = (lvl.right / 2 - 50, 20)
     lives_display_pos = (20, 20)
 
-    menu(screen)
-    while 1:
+    full_screen_image("resources/main_menu.png")
+    game_over = False
+    while not game_over:
         # input handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
@@ -93,13 +96,18 @@ def main(argv=None):
         collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
         for c in collide_list:
             if c.collidable(avatar):
-                avatar.lives -= 1
+                if avatar.lives > 0:
+                    avatar.lives -= 1
+                else:
+                    full_screen_image("resources/game_over.png")
+                    game_over = True
                 c.collided = True   # each block can only collide once
 
         # update game state
 
         # fps
-        clk.tick(60) # used by get_fps(), limits framerate (a 'hack' for now)
+        clk.tick(global_fps) # TODO: used by get_fps(),
+                             # limits framerate (a 'hack' for now)
         fps = clk.get_fps()
 
         # redraw
@@ -114,9 +122,8 @@ def main(argv=None):
         screen.blit(default_font.render('Lives: %d' % avatar.lives, 1, COLOR_BLACK),
                 lives_display_pos)
         pygame.display.flip()
-        #pygame.time.delay(10)
 
-def menu(screen):
+def menu():
     menu_surf = pygame.image.load("resources/main_menu.png").convert()
     menu_rect = menu_surf.get_rect()
     start_game = False
@@ -131,6 +138,26 @@ def menu(screen):
                     sys.exit()
         screen.blit(menu_surf, menu_rect)
         pygame.display.flip()
+        clk = pygame.time.Clock()
+        clk.tick(global_fps)
+
+def full_screen_image(img_filename):
+    menu_surf = pygame.image.load(img_filename).convert()
+    menu_rect = menu_surf.get_rect()
+    start_game = False
+    while not start_game:
+        # input handling
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    start_game = True
+                elif event.key == pygame.K_ESCAPE:
+                    sys.exit()
+        screen.blit(menu_surf, menu_rect)
+        pygame.display.flip()
+        clk = pygame.time.Clock()
+        clk.tick(global_fps)
 
 if __name__ == "__main__":
     pygame.init()
