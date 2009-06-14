@@ -33,3 +33,4 @@ Add fundamental features to the game play.
 =Milestone 3=
  * multiple levels to choose from
  * modifiable game settings in main menu
+ * load level settings from a file
