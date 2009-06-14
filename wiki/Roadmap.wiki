@@ -1,7 +1,7 @@
 #summary battle plan.
 #labels Phase-Requirements
 
-= Milestone 1 =
+= Milestone 1 - 2009.06.14=
 
 A rudimentary _playable_ version with crappy graphics and no interface. Basically, we should be able to:
 
