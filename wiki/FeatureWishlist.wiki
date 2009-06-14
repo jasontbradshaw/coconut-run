@@ -1,18 +1,18 @@
 #summary Features we would like to see and ideas of how to implement them.
 #labels Phase-Design
 
-= Introduction =
-<hr>
+= Feature Wishlist =
+----
 Here we will keep a record of features we want/need, and ideas of how to implement them (or at least how to _learn_ how we could implement them).
-<br>
+
 Add them as you see fit, and we'll discuss their merits.
 
-= Feature Wishlist =
-
-==True FPS Management==
+= Wishlist =
+----
+===True FPS Management===
 Instead of locking the frame-rate down to some arbitrary constant (currently 60 FPS), we should have it dynamically adapt based on how fast the machine is currently rendering it.
 
-*Implementation:* A sprite's movement speed should adapt based on the current frame-rate, and should appear to move at the same real-world speed regardless of whether the machine is rendering the level at 6 or 600 FPS.
+*Implementation:* A sprite's movement speed should adapt based on the current frame-rate, and should appear to move at the same real-world speed regardless of whether the machine is rendering the level at 6 or 600 FPS.  How: http://www.gamedev.net/reference/articles/article1382.asp
 
-==Coconut collision animation effect==
+===Coconut collision animation effect===
 Sound, special effects (dirt rise from ground after ground collision), text, shadows increase in size as coconuts fall.
