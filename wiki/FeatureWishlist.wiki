@@ -2,13 +2,11 @@
 #labels Phase-Design
 
 = Feature Wishlist =
-----
 Here we will keep a record of features we want/need, and ideas of how to implement them (or at least how to _learn_ how we could implement them).
 
 Add them as you see fit, and we'll discuss their merits.
 
 = Wishlist =
-----
 ===True FPS Management===
 Instead of locking the frame-rate down to some arbitrary constant (currently 60 FPS), we should have it dynamically adapt based on how fast the machine is currently rendering it.
 
