@@ -1,7 +1,7 @@
 #summary battle plan.
 #labels Phase-Requirements
 
-= Milestone 1 - 2009.06.14=
+=Milestone 1 - 2009.06.14=
 
 ==<font color="green">Accomplished!</font>==
 
@@ -13,10 +13,23 @@ A rudimentary _playable_ version with crappy graphics and no interface. Basicall
   * input --> change state --> output loop
   * collision detection
  * lose lives
- * exit game when lives <= 0
+ * exit game when lives < 0
 
-= Milestone 2 =
+=Milestone 2=
 
 Add fundamental features to the game play.
 
- * scoring system
+ * what is the goal of the game?
+  * just dodging coconuts is boring
+  * why is the player dodging coconuts? give the player a *motivation*
+   * need a back story
+  * how do you win?
+ * scoring system - points per second
+ * special drop items - life, umbrella, etc
+  * a good way to motivate players to move away from the center of the screen
+ * true FPS management
+  * useful for other features such as acceleration
+
+=Milestone 3=
+ * multiple levels to choose from
+ * modifiable game settings in main menu
