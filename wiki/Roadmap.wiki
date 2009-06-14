@@ -3,6 +3,8 @@
 
 = Milestone 1 - 2009.06.14=
 
+==<font color="green">Accomplished!</font>==
+
 A rudimentary _playable_ version with crappy graphics and no interface. Basically, we should be able to:
 
  * run `$ python coconut_run.py`
