@@ -41,7 +41,7 @@ $ python coconut_run.py
 
 ==== Windows ====
 
-I have no idea.
+Double-click coconut-run.py
 
 = Game Play =
 
