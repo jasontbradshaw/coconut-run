@@ -1,0 +1,48 @@
+#summary The official, bona fide game manual for Coco's Fun Coconut Run
+#labels Featured,Manual
+
+Welcome to the official *Coco's Fun Coconut Run* game manual! This manual (and the game) is still in active development, so please bear the lack of information.
+
+<wiki:toc max_depth="1" />
+ 
+= Quick Guide =
+
+This is a quick and dirty guide to Coco's Fun Coconut Run. It is enough to get you started, but advanced features are covered in the other sections of this manual.
+
+You are Coco, a monkey desperate for bananas.
+
+*TODO:* insert Coco image here.
+
+Your mission is to win the game.
+
+You control Coco by the following buttons:
+
+|| *Keyboard Button* || *Resulting Action* ||
+|| Left Arrow || move left ||
+|| Right Arrow || move right ||
+|| ESC || quit game ||
+|| Space || pick up item ||
+|| 1, 2, 3, 4 || use specified item in pouch ||
+
+
+= How to Install =
+
+You'll need Python to play Coco's Fun Coconut Run. Other libraries are included in the game.
+
+= How to Start =
+
+Each system is different.
+
+==== Unix (Linux, Mac OS X, etc) ====
+
+{{{
+$ python coconut_run.py
+}}}
+
+==== Windows ====
+
+I have no idea.
+
+= Game Play =
+
+Seriously, look at other game manuals and emulate their model.
