@@ -13,7 +13,6 @@ size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
 
 def main(argv=None):
-    """ main game loop """
     if argv is None:
         argv = sys.argv
 
@@ -32,7 +31,7 @@ def main(argv=None):
 
     # load level
     lvl = Level("Cocoana", "landscape.bmp",
-            120, 0.015, 0.00001,
+            120, 0.015, 0.00001, 0.1,
             10, 15,
             0, 0, width, height - 40)
 
@@ -40,7 +39,7 @@ def main(argv=None):
     avatar_surf = pygame.image.load(avatar_file).convert()
     avatar_surf.set_colorkey(COLORKEY)
     avatar_rect = avatar_surf.get_rect()
-    avatar_vel = 4
+    avatar_vel = 8
     avatar = Avatar(avatar_surf,
                     [lvl.right/2, lvl.bottom - avatar_rect.height],
                     avatar_vel, 3, 0)
@@ -85,9 +84,12 @@ def main(argv=None):
         screen.blit(default_font.render('Points: %d' % avatar.points, 1,
                                         COLOR_BLACK), points_display_pos)
         # draw debug text
-        screen.blit(default_font.render('block_freq: %f' % lvl.block_freq, 1,
+        screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq, 1,
                                         COLOR_BLACK), (20, 80))
         pygame.display.flip()
+
+        # update sprites
+        blocks.update() 
 
         # input handling
         for event in pygame.event.get():
@@ -106,20 +108,6 @@ def main(argv=None):
                 elif event.key == pygame.K_ESCAPE:
                     sys.exit()
         
-        # block creation
-        if random.random() < lvl.block_freq:
-            blocks.add(Block(block_surf,
-                             [random.randint(lvl.left, lvl.right), lvl.top],
-                             random.uniform(lvl.min_vel, lvl.max_vel),
-                             lvl.bottom))
-
-        # update sprites
-        blocks.update() 
-
-        # calculate state conditions
-        avatar.points += 1
-        lvl.block_freq += lvl.block_freq_inc
-        
         # collision detection
         collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
         for c in collide_list:
@@ -132,7 +120,18 @@ def main(argv=None):
                     game_over = True
                 c.collided = True   # each block can only collide once
 
+        # block creation
+        if random.random() < lvl.blk_freq:
+            blocks.add(Block(block_surf,
+                             [random.randint(lvl.left, lvl.right), lvl.top],
+                             random.uniform(lvl.min_vel, lvl.max_vel),
+                             lvl.bottom))
+
         # update game state
+        avatar.points += 1
+        if lvl.blk_freq < lvl.blk_freq_max:
+            lvl.blk_freq += lvl.blk_freq_inc
+        
 
 def full_screen_image(img_filename):
     menu_surf = pygame.image.load(img_filename).convert()

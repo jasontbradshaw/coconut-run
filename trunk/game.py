@@ -5,7 +5,7 @@ class Level:
     
     def __init__(self, name = "Default", bg_file="landscape.bmp",
                  time_limit = 120,
-                 block_freq = .015, block_freq_inc = 0.00001,
+                 blk_freq = .015, blk_freq_inc = 0.00001, blk_freq_max = 0.05,
                  min_vel = 2, max_vel = 10,
                  left = 0, top = 0, right = 640, bottom = 480,
                  items_dropped = [True, False]):
@@ -27,8 +27,9 @@ class Level:
         self.min_vel = min_vel          # velocity blocks fall
         self.max_vel = max_vel
 
-        self.block_freq = block_freq
-        self.block_freq_inc = block_freq_inc
+        self.blk_freq = blk_freq
+        self.blk_freq_inc = blk_freq_inc
+        self.blk_freq_max = blk_freq_max
         
         # items possibly dropped
         # [coconuts, bananas, ...]
