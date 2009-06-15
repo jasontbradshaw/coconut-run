@@ -6,8 +6,6 @@ from sprites import Block
 from sprites import Avatar
 from game import Level
 
-global_fps = 60
-
 # GUI window
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
@@ -22,7 +20,6 @@ def main(argv=None):
     block_file = resource_folder + 'coconut.bmp'
     COLORKEY = 0xFF00FF # transparent color
 
-
     # clock, for fps info and timing
     clk = pygame.time.Clock()
 
@@ -32,7 +29,7 @@ def main(argv=None):
     # load level
     lvl = Level("Cocoana", "landscape.bmp",
             120, 0.015, 0.00001, 0.1,
-            10, 15,
+            1, 3,
             0, 0, width, height - 40)
 
     # load and initialize avatar
@@ -62,12 +59,71 @@ def main(argv=None):
     game_over = False
 
     # main loop
+    LOGIC_TICKS = 30
+    SKIP_TICKS = 1000 / LOGIC_TICKS # used for delta
+    MAX_FRAMESKIP = 5 # minimum fps the game will run at before slowing down
+
+    tick_count = pygame.time.get_ticks()
+    loops = 0
+    delta = 0.0 # used for interpolation when drawing
+
     while not game_over:
 
-        # fps
-        clk.tick(global_fps) # limits framerate (a 'hack' for now)
+        loops = 0
+        while pygame.time.get_ticks() > tick_count and loops < MAX_FRAMESKIP:
+            
+            ############
+            #  LOGIC   #
+            ############
+
+            # input handling
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        if avatar.left_pos() > lvl.left:
+                            avatar.update(-1)
+                    elif event.key == pygame.K_RIGHT:
+                        if avatar.right_pos() < lvl.right:
+                            avatar.update(1)
+                    elif event.key == pygame.K_ESCAPE:
+                        sys.exit()
+            
+            # collision detection
+            collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
+            for c in collide_list:
+                if c.collidable(avatar):
+                    if avatar.lives > 0:
+                        avatar.lives -= 1
+                    else:
+                        # go to game over screen and quit
+                        full_screen_image(resource_folder + "game_over.png")
+                        game_over = True
+                    c.collided = True   # each block can only collide once
+
+            # block creation
+            if random.random() < lvl.blk_freq:
+                blocks.add(Block(block_surf,
+                                 [random.randint(lvl.left, lvl.right), lvl.top],
+                                 random.uniform(lvl.min_vel, lvl.max_vel),
+                                 lvl.bottom))
+
+            # update game state
+            avatar.points += 1
+            if lvl.blk_freq < lvl.blk_freq_max:
+                lvl.blk_freq += lvl.blk_freq_inc
+                tick_count += SKIP_TICKS
+                loops += 1
+
+        ############
+        # DRAWING  #
+        ############
+
+        clk.tick()
         fps = clk.get_fps()
 
+        delta = (pygame.time.get_ticks() + SKIP_TICKS - tick_count) / SKIP_TICKS
+        
         # draw sprites
         screen.blit(lvl.bg_image, lvl.bg_rect)
         for b in blocks:
@@ -78,7 +134,7 @@ def main(argv=None):
         screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
                 level_display_pos)
         screen.blit(default_font.render('FPS: %.1f' % fps, 1, COLOR_BLACK),
-                fps_display_pos)
+                                        fps_display_pos)
         screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
                                         COLOR_BLACK), lives_display_pos)
         screen.blit(default_font.render('Points: %d' % avatar.points, 1,
@@ -90,47 +146,6 @@ def main(argv=None):
 
         # update sprites
         blocks.update() 
-
-        # input handling
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    if avatar.left_pos() > lvl.left:
-                        avatar.update(-1)
-                        avatar.image = pygame.transform.flip(avatar.image,
-                                                             True, False)
-                elif event.key == pygame.K_RIGHT:
-                    if avatar.right_pos() < lvl.right:
-                        avatar.update(1)
-                        avatar.image = pygame.transform.flip(avatar.image,
-                                                             True, False)
-                elif event.key == pygame.K_ESCAPE:
-                    sys.exit()
-        
-        # collision detection
-        collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
-        for c in collide_list:
-            if c.collidable(avatar):
-                if avatar.lives > 0:
-                    avatar.lives -= 1
-                else:
-                    # go to game over screen and quit
-                    full_screen_image(resource_folder + "game_over.png")
-                    game_over = True
-                c.collided = True   # each block can only collide once
-
-        # block creation
-        if random.random() < lvl.blk_freq:
-            blocks.add(Block(block_surf,
-                             [random.randint(lvl.left, lvl.right), lvl.top],
-                             random.uniform(lvl.min_vel, lvl.max_vel),
-                             lvl.bottom))
-
-        # update game state
-        avatar.points += 1
-        if lvl.blk_freq < lvl.blk_freq_max:
-            lvl.blk_freq += lvl.blk_freq_inc
         
 
 def full_screen_image(img_filename):
@@ -149,7 +164,7 @@ def full_screen_image(img_filename):
         screen.blit(menu_surf, menu_rect)
         pygame.display.flip()
         clk = pygame.time.Clock()
-        clk.tick(global_fps)
+        clk.tick()
 
 if __name__ == "__main__":
     pygame.init()
