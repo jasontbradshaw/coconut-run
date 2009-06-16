@@ -1,6 +1,7 @@
 import sys
 import pygame
 import random
+import math
 
 from sprites import Block
 from sprites import Avatar
@@ -24,11 +25,11 @@ def main(argv=None):
     clk = pygame.time.Clock()
 
     # keyboard delay before key repeats
-    pygame.key.set_repeat(10, 10)
+    pygame.key.set_repeat(10, 0)
 
     # load level
     lvl = Level("Cocoana", "landscape.bmp",
-            120, 0.015, 0.0001, 0.1,
+            120, 0.015, 0.0001, 0.5,
             10, 15,
             0, 0, width, height - 40)
 
@@ -36,7 +37,7 @@ def main(argv=None):
     avatar_surf = pygame.image.load(avatar_file).convert()
     avatar_surf.set_colorkey(COLORKEY)
     avatar_rect = avatar_surf.get_rect()
-    avatar_vel = 40
+    avatar_vel = 20
     avatar_lives = 3
     avatar = Avatar(avatar_surf,
                     [lvl.right/2, lvl.bottom - avatar_rect.height], 0,
@@ -77,6 +78,8 @@ def main(argv=None):
             #  LOGIC   #
             ############
 
+            avatar.update()
+            
             # input handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
@@ -89,9 +92,9 @@ def main(argv=None):
                             avatar.update(0, avatar_vel)
                     elif event.key == pygame.K_ESCAPE:
                         sys.exit()
-                    elif event.key != pygame.K_LEFT and \
-                         event.key != pygame.K_RIGHT: # not being moved
-                        avatar.update()
+                    #elif event.key != pygame.K_LEFT and \
+                         #event.key != pygame.K_RIGHT: # not being moved
+                        #avatar.update()
 
             # block creation
             if random.random() < lvl.blk_freq:
@@ -131,16 +134,17 @@ def main(argv=None):
         clk.tick()
         fps = clk.get_fps()
 
-        delta = ((pygame.time.get_ticks() + skip_ticks - next_logic_tick)
+        delta = ((1.0 * pygame.time.get_ticks() + skip_ticks - next_logic_tick)
                  / skip_ticks)
         
         # draw sprites
         screen.blit(lvl.bg_image, lvl.bg_rect)
         for b in blocks:
-            screen.blit(b.image, b.rect)
-        avatar_rect = avatar.rect
+            fake_rect = b.rect.move(0, 0)
+            screen.blit(b.image, get_delta_coords(b, delta))
 
-        screen.blit(avatar.image, avatar.rect)
+        fake_rect = avatar.rect.move(0, 0)
+        screen.blit(avatar.image, get_delta_coords(avatar, delta))
 
         # draw text
         screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
@@ -174,6 +178,15 @@ def full_screen_image(img_filename):
         pygame.display.flip()
         clk = pygame.time.Clock()
         clk.tick()
+
+def get_delta_coords(sprite, delta):
+    """Calculate and return the delta coordinates of a particular sprite"""
+    rad = math.radians(sprite.dir)
+    
+    new_x = sprite.previous_position[0] + delta * (sprite.vel * math.cos(rad))
+    new_y = sprite.previous_position[1] + delta * (sprite.vel * math.sin(rad))
+    
+    return [new_x, new_y]
 
 if __name__ == "__main__":
     pygame.init()
