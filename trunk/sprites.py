@@ -18,9 +18,9 @@ class Avatar(pygame.sprite.Sprite):
         """
         
         if dir > 0:
-            self.rect = self.rect.move(self.vel, 0)
+            self.rect.move_ip(self.vel, 0)
         else:
-            self.rect = self.rect.move(-self.vel, 0)
+            self.rect.move_ip(-self.vel, 0)
 
     def left_pos(self):
         return self.rect.left
@@ -45,7 +45,7 @@ class Block(pygame.sprite.Sprite):
     def update(self):
         """moves block down by self.vel pixels"""
         if not self.on_ground():
-            self.rect = self.rect.move(0, self.vel)
+            self.rect.move_ip(0, self.vel)
         elif not self.hit_ground:   # has hit ground but flag not set
             # start timeout count down before killing sprite
             self.hit_ground = True
