@@ -11,6 +11,7 @@ class Avatar(pygame.sprite.Sprite):
 
         self.dir = dir
         self.vel = vel
+        self.previous_position = initial_position
         
         self.lives = lives
         self.points = points
@@ -23,7 +24,8 @@ class Avatar(pygame.sprite.Sprite):
         self.dir = dir
         self.vel = vel
         rad = math.radians(self.dir)
-        
+
+        self.previous_position = self.rect.topleft
         self.rect.move_ip(self.vel * math.cos(rad), self.vel * math.sin(rad))
         
     def left_pos(self):
@@ -43,6 +45,7 @@ class Block(pygame.sprite.Sprite):
         
         self.dir = dir
         self.vel = vel
+        self.previous_position = initial_position
         
         self.ground_lvl = ground_lvl
         self.time_hit_ground = 0
@@ -58,13 +61,14 @@ class Block(pygame.sprite.Sprite):
         self.dir = dir
         self.vel = vel
         rad = math.radians(self.dir)
+        self.previous_position = self.rect.topleft
         
         if not self.on_ground():
             self.rect.move_ip(self.vel * math.cos(rad), self.vel * math.sin(rad))
         elif not self.hit_ground:   # has hit ground but flag not set
             # start timeout count down before killing sprite
             self.hit_ground = True
-            #self.vel = 0
+            self.vel = 0
             self.time_hit_ground = pygame.time.get_ticks()
         
         # kill sprite if timeout done
