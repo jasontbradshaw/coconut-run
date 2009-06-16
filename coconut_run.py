@@ -28,18 +28,19 @@ def main(argv=None):
 
     # load level
     lvl = Level("Cocoana", "landscape.bmp",
-            120, 0.015, 0.00001, 0.1,
-            1, 3,
+            120, 0.015, 0.0001, 0.1,
+            10, 15,
             0, 0, width, height - 40)
 
     # load and initialize avatar
     avatar_surf = pygame.image.load(avatar_file).convert()
     avatar_surf.set_colorkey(COLORKEY)
     avatar_rect = avatar_surf.get_rect()
-    avatar_vel = 8
+    avatar_vel = 40
+    avatar_lives = 3
     avatar = Avatar(avatar_surf,
                     [lvl.right/2, lvl.bottom - avatar_rect.height],
-                    avatar_vel, 3, 0)
+                    avatar_vel, avatar_lives)
 
     # blocks
     block_surf = pygame.image.load(block_file).convert()
@@ -59,18 +60,18 @@ def main(argv=None):
     game_over = False
 
     # main loop
-    LOGIC_TICKS = 30
-    SKIP_TICKS = 1000 / LOGIC_TICKS # used for delta
-    MAX_FRAMESKIP = 5 # minimum fps the game will run at before slowing down
+    logic_fps = 30
+    skip_ticks = 1000 / logic_fps # ticks between logic updates
+    max_frameskip = 5 # minimum fps the game will run at before slowing down
 
-    tick_count = pygame.time.get_ticks()
+    next_logic_tick = pygame.time.get_ticks()
     loops = 0
     delta = 0.0 # used for interpolation when drawing
 
     while not game_over:
 
         loops = 0
-        while pygame.time.get_ticks() > tick_count and loops < MAX_FRAMESKIP:
+        while pygame.time.get_ticks() > next_logic_tick and loops < max_frameskip:
             
             ############
             #  LOGIC   #
@@ -112,8 +113,12 @@ def main(argv=None):
             avatar.points += 1
             if lvl.blk_freq < lvl.blk_freq_max:
                 lvl.blk_freq += lvl.blk_freq_inc
-                tick_count += SKIP_TICKS
-                loops += 1
+
+            # update sprites
+            blocks.update() 
+
+            next_logic_tick += skip_ticks
+            loops += 1
 
         ############
         # DRAWING  #
@@ -122,12 +127,14 @@ def main(argv=None):
         clk.tick()
         fps = clk.get_fps()
 
-        delta = (pygame.time.get_ticks() + SKIP_TICKS - tick_count) / SKIP_TICKS
+        delta = (pygame.time.get_ticks() + skip_ticks - next_logic_tick) / skip_ticks
         
         # draw sprites
         screen.blit(lvl.bg_image, lvl.bg_rect)
         for b in blocks:
             screen.blit(b.image, b.rect)
+        avatar_rect = avatar.rect
+
         screen.blit(avatar.image, avatar.rect)
 
         # draw text
@@ -143,9 +150,6 @@ def main(argv=None):
         screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq, 1,
                                         COLOR_BLACK), (20, 80))
         pygame.display.flip()
-
-        # update sprites
-        blocks.update() 
         
 
 def full_screen_image(img_filename):
