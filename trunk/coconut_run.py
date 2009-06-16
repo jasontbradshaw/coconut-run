@@ -39,8 +39,8 @@ def main(argv=None):
     avatar_vel = 40
     avatar_lives = 3
     avatar = Avatar(avatar_surf,
-                    [lvl.right/2, lvl.bottom - avatar_rect.height],
-                    avatar_vel, avatar_lives)
+                    [lvl.right/2, lvl.bottom - avatar_rect.height], 0,
+                    0, avatar_lives)
 
     # blocks
     block_surf = pygame.image.load(block_file).convert()
@@ -83,13 +83,32 @@ def main(argv=None):
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
                         if avatar.left_pos() > lvl.left:
-                            avatar.update(-1)
+                            avatar.update(180, avatar_vel)
                     elif event.key == pygame.K_RIGHT:
                         if avatar.right_pos() < lvl.right:
-                            avatar.update(1)
+                            avatar.update(0, avatar_vel)
                     elif event.key == pygame.K_ESCAPE:
                         sys.exit()
-            
+                    elif event.key != pygame.K_LEFT and \
+                         event.key != pygame.K_RIGHT: # not being moved
+                        avatar.update()
+
+            # block creation
+            if random.random() < lvl.blk_freq:
+                blocks.add(Block(block_surf,
+                                 [random.randint(lvl.left, lvl.right), lvl.top],
+                                 90, random.uniform(lvl.min_vel, lvl.max_vel),
+                                 lvl.bottom))
+
+            # update game state
+            avatar.points += 1
+            if lvl.blk_freq < lvl.blk_freq_max:
+                lvl.blk_freq += lvl.blk_freq_inc
+
+            # update sprites
+            for b in blocks:
+                b.update(b.dir, b.vel)
+
             # collision detection
             collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
             for c in collide_list:
@@ -102,21 +121,6 @@ def main(argv=None):
                         game_over = True
                     c.collided = True   # each block can only collide once
 
-            # block creation
-            if random.random() < lvl.blk_freq:
-                blocks.add(Block(block_surf,
-                                 [random.randint(lvl.left, lvl.right), lvl.top],
-                                 random.uniform(lvl.min_vel, lvl.max_vel),
-                                 lvl.bottom))
-
-            # update game state
-            avatar.points += 1
-            if lvl.blk_freq < lvl.blk_freq_max:
-                lvl.blk_freq += lvl.blk_freq_inc
-
-            # update sprites
-            blocks.update() 
-
             next_logic_tick += skip_ticks
             loops += 1
 
@@ -127,7 +131,8 @@ def main(argv=None):
         clk.tick()
         fps = clk.get_fps()
 
-        delta = (pygame.time.get_ticks() + skip_ticks - next_logic_tick) / skip_ticks
+        delta = ((pygame.time.get_ticks() + skip_ticks - next_logic_tick)
+                 / skip_ticks)
         
         # draw sprites
         screen.blit(lvl.bg_image, lvl.bg_rect)
