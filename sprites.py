@@ -31,21 +31,18 @@ class Object(pygame.sprite.Sprite):
         self.rect.move_ip(self.vel * math.cos(rad), self.vel * math.sin(rad))
         self.cur_pos = self.rect.topleft
 
-    def blit_delta(self, screen, delta):
+    def get_delta(self, delta):
         """
-        Blit your deltified movement onto a surface.
+        Calculat your deltified movement onto a surface.
         screen = surface to blit to
         delta = delta value (0.0 <= delta <= 1.0)
         """
-        if self.vel != 0.0:
-            rad = math.radians(self.dir)
-            
-            dx = self.prev_pos[0] + delta * (self.vel * math.cos(rad))
-            dy = self.prev_pos[1] + delta * (self.vel * math.sin(rad))
-            
-            screen.blit(self.image, [dx, dy])
-        else:
-            screen.blit(self.image, self.cur_pos)
+        rad = math.radians(self.dir)
+        
+        dx = self.prev_pos[0] + delta * (self.vel * math.cos(rad))
+        dy = self.prev_pos[1] + delta * (self.vel * math.sin(rad))
+
+        return [dx, dy]
 
     def update(self):
         """
@@ -88,7 +85,10 @@ class Block(Object):
         """
         Perform movement and check if we're on the ground.
         If we're on the ground, stop.
-        """        
+        """
+        self.vel = 0.0
+        self.prev_pos = self.cur_pos
+        
         if self.on_ground():
             self.vel = 0
             self.time_hit_ground = pygame.time.get_ticks()
