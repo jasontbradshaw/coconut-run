@@ -34,3 +34,6 @@ Add fundamental features to the game play.
  * multiple levels to choose from
  * modifiable game settings in main menu
  * load level settings from a file
+
+=Release Candidate 1=
+ * ZERO [http://code.google.com/p/coconut-run/issues/list?can=2&q=label:Defect defects]!
