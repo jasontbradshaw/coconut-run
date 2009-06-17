@@ -65,7 +65,7 @@ def main(argv=None):
     game_over = False
 
     # main loop
-    logic_fps = 3
+    logic_fps = 30
     skip_ticks = 1000 / logic_fps # ticks between logic updates in milliseconds
     max_frameskip = 5 # minimum fps the game will run at before slowing down
 
@@ -147,9 +147,9 @@ def main(argv=None):
         screen.blit(lvl.bg_image, lvl.bg_rect)
         
         for b in blocks:
-            b.blit_delta(screen, delta)
+            screen.blit(b.image, b.get_delta(delta))
 
-        avatar.blit_delta(screen, delta)
+        screen.blit(avatar.image, avatar.get_delta(delta))
 
         # draw text
         screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
