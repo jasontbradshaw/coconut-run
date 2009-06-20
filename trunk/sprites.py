@@ -89,11 +89,14 @@ class Block(Object):
         self.vel = 0.0
         self.prev_pos = self.cur_pos
         
-        if self.on_ground():
-            self.vel = 0
-            self.time_hit_ground = pygame.time.get_ticks()
-        else:
+        if not self.on_ground():
             self.move(self.dir, self.speed)
+        elif not self.hit_ground:   # has hit ground but flag not set
+            # start timeout count down before killing sprite
+            self.hit_ground = True
+            self.time_hit_ground = pygame.time.get_ticks()
+        else:   # on ground
+            self.vel = 0
             
         # kill sprite if timeout done
         if self.hit_ground and \
@@ -101,9 +104,8 @@ class Block(Object):
             self.kill()
 
     def on_ground(self):
-        """returns True if block is on the ground and sets a hit_ground flag"""
+        """returns True if block is on the ground"""
         if self.ground_lvl - self.rect.top - self.rect.height <= 0:
-            self.hit_ground = True
             return True
         return False
 

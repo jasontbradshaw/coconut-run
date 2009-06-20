@@ -19,7 +19,7 @@ def main(argv=None):
     resource_folder = 'resources/'
     fonts_folder = 'fonts/'
     
-    avatar_file = resource_folder + 'avatar.bmp'
+    avatar_file = resource_folder + 'avatar.png'
     block_file = resource_folder + 'coconut.bmp'
     
     COLORKEY = 0xFF00FF # transparent color
@@ -37,7 +37,7 @@ def main(argv=None):
             0, 0, width, height - 40)
 
     # avatar
-    avatar_surf = pygame.image.load(avatar_file).convert()
+    avatar_surf = pygame.image.load(avatar_file).convert_alpha()
     avatar_surf.set_colorkey(COLORKEY)
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
