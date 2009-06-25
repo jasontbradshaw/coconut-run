@@ -2,7 +2,6 @@ import sys
 import pygame
 import random
 import math
-import random
 
 from sprites import Block
 from sprites import Avatar
@@ -42,7 +41,7 @@ def main(argv=None):
     avatar_surf.set_colorkey(COLORKEY)
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
-    avatar_lives = 3
+    avatar_lives = 10
     print("Bottom: ", lvl.bottom)
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0)
@@ -51,7 +50,6 @@ def main(argv=None):
 
     # blocks
     block_surf = pygame.image.load(block_file).convert_alpha()
-    block_surf.set_colorkey(COLORKEY)
     blocks = pygame.sprite.Group()
     
     # text
@@ -151,20 +149,19 @@ def main(argv=None):
 
         screen.blit(lvl.bg_image, lvl.bg_rect)
         
-        screen.blit(avatar.image, avatar.get_delta(delta))
-
-        avatar_drawn = False
         for b in blocks:
             screen.blit(b.image, b.get_delta(delta))
 
+        screen.blit(avatar.image, avatar.get_delta(delta))
+        blit_lives_icon(screen, avatar.lives)
 
         # draw text
         screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
                 level_display_pos)
         screen.blit(default_font.render('FPS: %.1f' % fps, 1, COLOR_BLACK),
                                         fps_display_pos)
-        screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
-                                        COLOR_BLACK), lives_display_pos)
+        #screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
+        #                               COLOR_BLACK), lives_display_pos)
         screen.blit(default_font.render('Points: %d' % avatar.points, 1,
                                         COLOR_BLACK), points_display_pos)
         # draw debug text
@@ -173,6 +170,18 @@ def main(argv=None):
         
         pygame.display.flip()
         
+
+def blit_lives_icon(screen, lives):
+    heart_file = 'resources/heart.png'
+    heart_surf = pygame.image.load(heart_file).convert_alpha()
+    heart_rect = heart_surf.get_rect()
+    heart_rect.topleft = (20, 20)
+    x = 20
+    y = 20
+    for i in range(lives):
+        screen.blit(heart_surf, heart_rect)
+        heart_rect.move_ip(32+8, 0)
+
 
 def full_screen_image(img_filename):
     menu_surf = pygame.image.load(img_filename).convert()
@@ -192,14 +201,6 @@ def full_screen_image(img_filename):
         clk = pygame.time.Clock()
         clk.tick()
 
-def get_delta_coords(sprite, delta):
-    """Calculate and return the delta coordinates of a particular sprite"""
-    rad = math.radians(sprite.dir)
-    
-    new_x = sprite.previous_position[0] + delta * (sprite.vel * math.cos(rad))
-    new_y = sprite.previous_position[1] + delta * (sprite.vel * math.sin(rad))
-    
-    return [new_x, new_y]
 
 if __name__ == "__main__":
     pygame.init()
