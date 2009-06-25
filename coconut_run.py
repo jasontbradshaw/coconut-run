@@ -2,6 +2,7 @@ import sys
 import pygame
 import random
 import math
+import random
 
 from sprites import Block
 from sprites import Avatar
@@ -20,7 +21,7 @@ def main(argv=None):
     fonts_folder = 'fonts/'
     
     avatar_file = resource_folder + 'avatar.png'
-    block_file = resource_folder + 'coconut.bmp'
+    block_file = resource_folder + 'coconut.png'
     
     COLORKEY = 0xFF00FF # transparent color
 
@@ -42,11 +43,14 @@ def main(argv=None):
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
     avatar_lives = 3
-    avatar = Avatar(avatar_surf, [lvl.right/2, lvl.bottom - avatar_rect.height],
+    print("Bottom: ", lvl.bottom)
+    avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0)
+    print avatar.rect.bottomleft
+    print avatar.rect.topleft
 
     # blocks
-    block_surf = pygame.image.load(block_file).convert()
+    block_surf = pygame.image.load(block_file).convert_alpha()
     block_surf.set_colorkey(COLORKEY)
     blocks = pygame.sprite.Group()
     
@@ -144,12 +148,15 @@ def main(argv=None):
                  / skip_ticks)
         
         # draw sprites w/ delta movement
+
         screen.blit(lvl.bg_image, lvl.bg_rect)
         
+        screen.blit(avatar.image, avatar.get_delta(delta))
+
+        avatar_drawn = False
         for b in blocks:
             screen.blit(b.image, b.get_delta(delta))
 
-        screen.blit(avatar.image, avatar.get_delta(delta))
 
         # draw text
         screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
