@@ -2,10 +2,20 @@ import sys
 import pygame
 import random
 import math
+import copy
 
-from sprites import Block
+from sprites import Droppable
 from sprites import Avatar
+from sprites import Coconut
+from sprites import Banana
 from game import Level
+
+# constants
+COLORKEY = 0xFF00FF # transparent color
+DIR_RIGHT = 0
+DIR_DOWN = 90
+DIR_LEFT = 180
+DIR_UP = 270
 
 # GUI window
 size = width, height = 640, 480
@@ -20,9 +30,8 @@ def main(argv=None):
     fonts_folder = 'fonts/'
     
     avatar_file = resource_folder + 'avatar.png'
-    block_file = resource_folder + 'coconut.png'
-    
-    COLORKEY = 0xFF00FF # transparent color
+    coconut_file = resource_folder + 'coconut.png'
+    banana_file = resource_folder + 'banana.png'
 
     # clock, for fps info and timing
     clk = pygame.time.Clock()
@@ -36,22 +45,22 @@ def main(argv=None):
             10, 15,
             0, 0, width, height - 40)
 
-    # avatar
+    # load surfaces
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
-    avatar_surf.set_colorkey(COLORKEY)
+    coconut_surf = pygame.image.load(coconut_file).convert_alpha()
+    banana_surf = pygame.image.load(banana_file).convert_alpha() 
+
+    # set up avatar
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
     avatar_lives = 10
-    print("Bottom: ", lvl.bottom)
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0)
-    print avatar.rect.bottomleft
-    print avatar.rect.topleft
 
-    # blocks
-    block_surf = pygame.image.load(block_file).convert_alpha()
-    blocks = pygame.sprite.Group()
-    
+    # make groups
+    coconuts = pygame.sprite.Group()
+    bananas = pygame.sprite.Group()
+
     # text
     default_font = pygame.font.Font(resource_folder + fonts_folder +
                                     "anmari.ttf", 26)
@@ -72,13 +81,14 @@ def main(argv=None):
     max_frameskip = 5 # minimum fps the game will run at before slowing down
 
     next_logic_tick = pygame.time.get_ticks()
-    loops = 0
+    logical_loops = 0
     delta = 0.0 # used for interpolation when drawing
 
     while not game_over:
 
-        loops = 0
-        while pygame.time.get_ticks() > next_logic_tick and loops < max_frameskip:
+        logical_loops = 0
+        while (pygame.time.get_ticks() > next_logic_tick and
+                logical_loops < max_frameskip):
             
             ############
             #  LOGIC   #
@@ -103,13 +113,19 @@ def main(argv=None):
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
 
-            # block creation
+            # coconut creation
             if random.random() < lvl.blk_freq:
-                block_speed = random.uniform(lvl.min_vel, lvl.max_vel)
-                blocks.add(Block(block_surf,
-                                 [random.randint(lvl.left, lvl.right), lvl.top],
-                                 90, block_speed,
-                                 block_speed, lvl.bottom))
+                speed = random.uniform(lvl.min_vel, lvl.max_vel)
+                c = (Coconut(coconut_surf, [random.randint(lvl.left, lvl.right),
+                    lvl.top], DIR_DOWN, speed, speed, lvl.bottom,
+                    timeout=5000))
+                coconuts.add(c)
+            # banana creation
+            if random.random() < lvl.blk_freq:
+                speed = random.uniform(lvl.min_vel, lvl.max_vel)
+                b = (Banana(banana_surf, [random.randint(lvl.left, lvl.right),
+                    lvl.top], DIR_DOWN, speed, speed, lvl.bottom, timeout=5000))
+                bananas.add(b)
 
             # update game state
             avatar.points += 1
@@ -117,23 +133,32 @@ def main(argv=None):
                 lvl.blk_freq += lvl.blk_freq_inc
 
             # update sprites
-            for b in blocks:
+            for c in coconuts:
+                c.update()
+            for b in bananas:
                 b.update()
 
             # collision detection
-            collide_list = pygame.sprite.spritecollide(avatar, blocks, False)
-            for c in collide_list:
-                if c.collidable(avatar):
+            coconuts_collide_list = pygame.sprite.spritecollide(avatar,
+                    coconuts, False)
+            for c in coconuts_collide_list:
+                if c.actionable(avatar):
                     if avatar.lives > 0:
                         avatar.lives -= 1
                     else:
                         # go to game over screen and quit
                         full_screen_image(resource_folder + "game_over.png")
                         game_over = True
-                    c.collided = True   # each block can only collide once
+                    c.collided = True   # each coconut can only collide once
+            bananas_collide_list = pygame.sprite.spritecollide(avatar,
+                    bananas, False)
+            for b in bananas_collide_list:
+                if b.actionable(avatar):
+                    b.collided = True   # each banana can only collide once
+                    b.kill()
 
             next_logic_tick += skip_ticks
-            loops += 1
+            logical_loops += 1
 
         ############
         # DRAWING  #
@@ -149,7 +174,10 @@ def main(argv=None):
 
         screen.blit(lvl.bg_image, lvl.bg_rect)
         
-        for b in blocks:
+        for c in coconuts:
+            screen.blit(c.image, c.get_delta(delta))
+
+        for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
 
         screen.blit(avatar.image, avatar.get_delta(delta))
