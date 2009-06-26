@@ -17,6 +17,9 @@ A rudimentary _playable_ version with crappy graphics and no interface. Basicall
 
 =Milestone 2=
 
+==Feature freeze on June 27, 2009==
+After June 27th, no more feature requests for Milestone 2 should be added. Set the milestone number on issues so we know what we need to work on.
+
 Add fundamental features to the game play.
 
  * what is the goal of the game?
