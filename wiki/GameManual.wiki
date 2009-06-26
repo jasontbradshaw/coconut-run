@@ -24,6 +24,10 @@ You control Coco by the following buttons:
 || Space || pick up item ||
 || 1, 2, 3, 4 || use specified item in pouch ||
 
+Items fall down.
+|| *Item* || *Description* ||
+||http://coconut-run.googlecode.com/svn/trunk/resources/coconut.png Coconut|| Dodge the coconuts! If you get hit, you lose a life.||
+||http://coconut-run.googlecode.com/svn/trunk/resources/banana.png Banana|| Catch the bananas! Use your caught bananas to buy items for your avatar.||
 
 = How to Install =
 
