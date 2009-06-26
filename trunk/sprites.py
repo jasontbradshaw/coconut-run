@@ -77,17 +77,17 @@ class Avatar(Movable):
     def right_pos(self):
         return self.rect.right
 
-class Block(Movable):
+class Droppable(Movable):
 
     def __init__(self, surface, init_pos, dir = 0, vel = 0, speed = 0,
-                 ground_lvl = 0):
+                 ground_lvl = 0, timeout=-1):
         Movable.__init__(self, surface, init_pos, dir, vel, speed)
         
         self.collide_rect = self.rect
         self.ground_lvl = ground_lvl
         
-        self.timeout = 5000   # ms spent on ground before being killed
-                              # -1 = infinity
+        self.timeout = timeout  # ms spent on ground before being killed
+                                # -1 = infinity
 
         self.time_hit_ground = 0
         self.hit_ground = False
@@ -112,8 +112,8 @@ class Block(Movable):
             self.vel = 0
             
         # kill sprite if timeout done
-        if self.hit_ground and \
-           pygame.time.get_ticks() - self.time_hit_ground >= self.timeout:
+        if (self.timeout != -1 and self.hit_ground and
+           pygame.time.get_ticks() - self.time_hit_ground >= self.timeout):
             self.kill()
 
     def on_ground(self):
@@ -122,17 +122,39 @@ class Block(Movable):
             return True
         return False
 
-    def collidable(self, avatar):
+    def actionable(self, avatar):
         """
-        Returns True if block collided with avatar.
-        Collided when:
-        1) bottom of block is between the top and halfway point of avatar
-        2) has not collided before
+        Returns True when Droppable and Avatar meet some requirement so that
+        an action by the game can be done.
+
+        Requirements are defined by derived classes.
         """
-        if self.rect.bottom >= avatar.rect.top and \
-                not self.collided and \
-                self.rect.bottom < (avatar.rect.top + avatar.rect.height / 2):
+        pass
+        
+class Coconut(Droppable):
+
+    def actionable(self, avatar):
+        """
+        Returns True if:
+        1) Coconut and Avatar have collided (assumed).
+        2) Coconut is touching the top half of Avatar.
+        3) Has not collided before.
+        """
+        if (self.rect.bottom >= avatar.rect.top and not self.collided and
+                self.rect.bottom < (avatar.rect.top + avatar.rect.height/2)):
             return True
         return False
-        
+
+class Banana(Droppable):
+
+    def actionable(self, avatar):
+        """
+        Returns True if:
+        1) Banana and Avatar have collided (assumed).
+        2) Banana is not on ground.
+        3) Has not collided before.
+        """
+        if not self.on_ground() and not self.collided:
+            return True
+        return False
 
