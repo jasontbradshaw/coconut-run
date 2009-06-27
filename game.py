@@ -20,7 +20,7 @@ class Level:
         
         # build background image and rect
         self.bg_file = bg_file
-        self.bg_image = pygame.image.load("resources/" + bg_file).convert()
+        self.bg_image = pygame.image.load(bg_file).convert()
         self.bg_rect = self.bg_image.get_rect()
         
         self.time_limit = time_limit    # seconds; -1 = infinity

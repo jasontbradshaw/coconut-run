@@ -17,6 +17,17 @@ DIR_DOWN = 90
 DIR_LEFT = 180
 DIR_UP = 270
 
+DEFAULT_TIMEOUT = 3000
+
+resource_folder = 'resources/'
+graphics_folder = resource_folder + 'graphics/'
+avatar_folder = graphics_folder + 'avatar/'
+backdrops_folder = graphics_folder + 'backdrops/'
+droppable_folder = graphics_folder + 'droppable/'
+icons_folder = graphics_folder + 'icons/'
+items_folder = graphics_folder + 'items/'
+fonts_folder = resource_folder + 'fonts/'
+
 # GUI window
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
@@ -26,12 +37,9 @@ def main(argv=None):
         argv = sys.argv
 
     # resources
-    resource_folder = 'resources/'
-    fonts_folder = 'fonts/'
-    
-    avatar_file = resource_folder + 'avatar.png'
-    coconut_file = resource_folder + 'coconut.png'
-    banana_file = resource_folder + 'banana.png'
+    avatar_file = avatar_folder + 'avatar.png'
+    coconut_file = droppable_folder + 'coconut.png'
+    banana_file = droppable_folder + 'banana.png'
 
     # clock, for fps info and timing
     clk = pygame.time.Clock()
@@ -40,7 +48,7 @@ def main(argv=None):
     pygame.key.set_repeat(10, 0)
 
     # level
-    lvl = Level("Cocoana", "landscape.bmp",
+    lvl = Level("Cocoana", backdrops_folder + "landscape.png",
             120, 0.015, 0.0001, 0.75,
             10, 15,
             0, 0, width, height - 40)
@@ -62,8 +70,7 @@ def main(argv=None):
     bananas = pygame.sprite.Group()
 
     # text
-    default_font = pygame.font.Font(resource_folder + fonts_folder +
-                                    "anmari.ttf", 26)
+    default_font = pygame.font.Font(fonts_folder + "anmari.ttf", 26)
     COLOR_BLACK = (0, 0, 0)
     
     fps_display_pos = (lvl.right - 140, 20)
@@ -72,7 +79,7 @@ def main(argv=None):
     points_display_pos = (20, 50)
 
     # menus
-    full_screen_image(resource_folder + "main_menu.png")
+    full_screen_image(backdrops_folder + "main_menu.png")
     game_over = False
 
     # main loop
@@ -118,13 +125,14 @@ def main(argv=None):
                 speed = random.uniform(lvl.min_vel, lvl.max_vel)
                 c = (Coconut(coconut_surf, [random.randint(lvl.left, lvl.right),
                     lvl.top], DIR_DOWN, speed, speed, lvl.bottom,
-                    timeout=5000))
+                    timeout=DEFAULT_TIMEOUT))
                 coconuts.add(c)
             # banana creation
             if random.random() < lvl.blk_freq:
                 speed = random.uniform(lvl.min_vel, lvl.max_vel)
                 b = (Banana(banana_surf, [random.randint(lvl.left, lvl.right),
-                    lvl.top], DIR_DOWN, speed, speed, lvl.bottom, timeout=5000))
+                    lvl.top], DIR_DOWN, speed, speed, lvl.bottom,
+                    timeout=DEFAULT_TIMEOUT))
                 bananas.add(b)
 
             # update game state
@@ -147,7 +155,7 @@ def main(argv=None):
                         avatar.lives -= 1
                     else:
                         # go to game over screen and quit
-                        full_screen_image(resource_folder + "game_over.png")
+                        full_screen_image(backdrops_folder + "game_over.png")
                         game_over = True
                     c.collided = True   # each coconut can only collide once
             bananas_collide_list = pygame.sprite.spritecollide(avatar,
@@ -200,7 +208,7 @@ def main(argv=None):
         
 
 def blit_lives_icon(screen, lives):
-    heart_file = 'resources/heart.png'
+    heart_file = icons_folder + 'heart.png'
     heart_surf = pygame.image.load(heart_file).convert_alpha()
     heart_rect = heart_surf.get_rect()
     heart_rect.topleft = (20, 20)
