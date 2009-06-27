@@ -7,15 +7,16 @@ Welcome to the official *Coco's Fun Coconut Run* game manual! This manual (and t
  
 = Quick Guide =
 
-This is a quick and dirty guide to Coco's Fun Coconut Run. It is enough to get you started, but advanced features are covered in the other sections of this manual.
-
-You are Coco, a monkey desperate for bananas.
-
 *TODO:* insert Coco image here.
 
-Your mission is to win the game.
+You are Coco, a coconut-dodging monkey desperate for bananas. Use baskets to catch the bananas before they hit the ground. Fill up all the baskets and trade the bananas for cool items to wear. But be careful of the falling coconuts. They hurt!
 
-You control Coco by the following buttons:
+|| *Item* || *Description* ||
+||http://coconut-run.googlecode.com/svn/trunk/resources/graphics/icons/coconut_highres.png|| Dodge the coconuts! If you get hit, you lose a life.||
+||http://coconut-run.googlecode.com/svn/trunk/resources/graphics/icons/basket_highres.png|| Grab a basket from the ground by pressing [SPACE]. Use this basket to catch bananas!||
+||http://coconut-run.googlecode.com/svn/trunk/resources/graphics/icons/banana_highres.png|| Catch the bananas! Use your caught bananas to buy items for your avatar.||
+
+Control Coco with the following buttons:
 
 || *Keyboard Button* || *Resulting Action* ||
 || Left Arrow || move left ||
@@ -23,11 +24,6 @@ You control Coco by the following buttons:
 || ESC || quit game ||
 || Space || pick up item ||
 || 1, 2, 3, 4 || use specified item in pouch ||
-
-Items fall down.
-|| *Item* || *Description* ||
-||http://coconut-run.googlecode.com/svn/trunk/resources/coconut.png Coconut|| Dodge the coconuts! If you get hit, you lose a life.||
-||http://coconut-run.googlecode.com/svn/trunk/resources/banana.png Banana|| Catch the bananas! Use your caught bananas to buy items for your avatar.||
 
 = How to Install =
 
