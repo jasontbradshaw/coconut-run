@@ -9,6 +9,7 @@ from sprites import Avatar
 from sprites import Coconut
 from sprites import Banana
 from game import Level
+from game import Music
 
 # constants
 COLORKEY = 0xFF00FF # transparent color
@@ -20,6 +21,7 @@ DIR_UP = 270
 DEFAULT_TIMEOUT = 3000
 
 resource_folder = 'resources/'
+audio_folder = resource_folder + 'audio/'
 graphics_folder = resource_folder + 'graphics/'
 avatar_folder = graphics_folder + 'avatar/'
 backdrops_folder = graphics_folder + 'backdrops/'
@@ -38,8 +40,10 @@ def main(argv=None):
 
     # resources
     avatar_file = avatar_folder + 'avatar.png'
-    coconut_file = droppable_folder + 'coconut.png'
-    banana_file = droppable_folder + 'banana.png'
+    #coconut_file = droppable_folder + 'coconut.png'
+    coconut_file = icons_folder + 'coconut_highres.png'
+    #banana_file = droppable_folder + 'banana.png'
+    banana_file = icons_folder + 'banana_highres.png'
 
     # clock, for fps info and timing
     clk = pygame.time.Clock()
@@ -53,6 +57,9 @@ def main(argv=None):
             10, 15,
             0, 0, width, height - 40)
 
+    bg_music = Music(audio_folder + 'sample_music.ogg')
+    bg_music.play()
+
     # load surfaces
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
     coconut_surf = pygame.image.load(coconut_file).convert_alpha()
@@ -61,7 +68,7 @@ def main(argv=None):
     # set up avatar
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
-    avatar_lives = 10
+    avatar_lives = 20
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0)
 
@@ -155,6 +162,7 @@ def main(argv=None):
                         avatar.lives -= 1
                     else:
                         # go to game over screen and quit
+                        bg_music.fadeout(3000)
                         full_screen_image(backdrops_folder + "game_over.png")
                         game_over = True
                     c.collided = True   # each coconut can only collide once
@@ -215,6 +223,8 @@ def blit_lives_icon(screen, lives):
     x = 20
     y = 20
     for i in range(lives):
+        if i > 14:
+            break
         screen.blit(heart_surf, heart_rect)
         heart_rect.move_ip(32+8, 0)
 

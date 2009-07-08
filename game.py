@@ -35,4 +35,24 @@ class Level:
         # [coconuts, bananas, ...]
         self.items_dropped = items_dropped
 
+class Music:
+    """A silly wrapper around pygame.mixer.music."""
 
+    def __init__(self, filename=""):
+        self.filename = filename
+        pygame.mixer.music.load(filename)
+
+    def play(self, loops=-1, start=0):
+        pygame.mixer.music.play(loops, start)
+
+    def stop(self):
+        pygame.mixer.music.stop()
+
+    def pause(self):
+        pygame.mixer.music.pause()
+
+    def unpause(self):
+        pygame.mixer.music.unpause()
+    
+    def fadeout(self, time):
+        pygame.mixer.music.fadeout(time)
