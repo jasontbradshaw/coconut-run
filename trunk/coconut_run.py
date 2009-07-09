@@ -143,15 +143,12 @@ def main(argv=None):
                 bananas.add(b)
 
             # update game state
-            avatar.points += 1
             if lvl.blk_freq < lvl.blk_freq_max:
                 lvl.blk_freq += lvl.blk_freq_inc
 
             # update sprites
-            for c in coconuts:
-                c.update()
-            for b in bananas:
-                b.update()
+            coconuts.update()
+            bananas.update()
 
             # collision detection
             coconuts_collide_list = pygame.sprite.spritecollide(avatar,
@@ -172,6 +169,7 @@ def main(argv=None):
                 if b.actionable(avatar):
                     b.collided = True   # each banana can only collide once
                     b.kill()
+                    avatar.points += 1  # avatar gains 1 point for banana
 
             next_logic_tick += skip_ticks
             logical_loops += 1
