@@ -1,11 +1,11 @@
-class Primitive:
-    def __init__(self, sym="", desc=""):
+class Symbol:
+    def __init__(self, sym=""):
         self.sym = sym
-        self.desc = desc
 
 class Expression:
-    def __init__(self):
-        self.expr = []
+    def __init__(self, expr = [], goal = 0):
+        self.expr = expr
+        self.goal = goal
     
     def insert(self, i, p):
         self.expr.insert(i, p)
@@ -25,3 +25,8 @@ class Expression:
             str = str + e.sym
         return str
 
+    def valid(self):
+        if self.eval() == valid:
+            print "VALID!"
+            return True
+        return False

@@ -1,6 +1,8 @@
 import pygame
 import math
 import copy
+from libcocorun import Expression
+from libcocorun import Symbol
 
 class Movable(pygame.sprite.Sprite):
     def __init__(self, surface, init_pos = (0, 0),
@@ -132,6 +134,15 @@ class Droppable(Movable):
         pass
         
 class Coconut(Droppable):
+     
+    def __init__(self, surface, init_pos, dir = 0, vel = 0, speed = 0,
+            ground_lvl = 0, timeout=-1, expr = Expression()):
+        Droppable.__init__(self, surface, init_pos, dir, vel, speed,
+                ground_lvl, timeout)
+        self.expr = expr
+
+    def value(self):
+        return this.expr.eval()
 
     def actionable(self, avatar):
         """
