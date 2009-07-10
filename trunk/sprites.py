@@ -142,7 +142,10 @@ class Coconut(Droppable):
         self.expr = expr
 
     def value(self):
-        return this.expr.eval()
+        try:
+            return self.expr.eval()
+        except:
+            return -1
 
     def actionable(self, avatar):
         """

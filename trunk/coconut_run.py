@@ -10,6 +10,7 @@ from sprites import Coconut
 from sprites import Banana
 from game import Level
 from game import Music
+from libcocorun import Expression
 
 # constants
 COLORKEY = 0xFF00FF # transparent color
@@ -56,6 +57,7 @@ def main(argv=None):
             120, 0.015, 0.0001, 0.75,
             10, 15,
             0, 0, width, height - 40)
+    expr = Expression()
 
     bg_music = Music(audio_folder + 'sample_music.ogg')
     bg_music.play()
@@ -132,7 +134,7 @@ def main(argv=None):
                 speed = random.uniform(lvl.min_vel, lvl.max_vel)
                 c = (Coconut(coconut_surf, [random.randint(lvl.left, lvl.right),
                     lvl.top], DIR_DOWN, speed, speed, lvl.bottom,
-                    timeout=DEFAULT_TIMEOUT))
+                    timeout=DEFAULT_TIMEOUT, expr=randexpr()))
                 coconuts.add(c)
             # banana creation
             if random.random() < lvl.blk_freq:
@@ -155,6 +157,11 @@ def main(argv=None):
                     coconuts, False)
             for c in coconuts_collide_list:
                 if c.actionable(avatar):
+                    print("Hit Coconut w/ expression: " + str(c.expr))
+                    expr += c.expr
+                    try:
+                        print(str(expr) + " = " + str(expr.eval()))
+                    except: pass
                     if avatar.lives > 0:
                         avatar.lives -= 1
                     else:
@@ -212,6 +219,17 @@ def main(argv=None):
         
         pygame.display.flip()
         
+def randexpr():
+    operators = ["+", "-"]
+    operator_freq = .4
+
+    a = 1
+    b = 10
+
+    if random.random() < operator_freq:
+        return Expression([operators[random.randint(0, len(operators)-1)]])
+
+    return Expression([random.randint(a, b)])
 
 def blit_lives_icon(screen, lives):
     heart_file = icons_folder + 'heart.png'
