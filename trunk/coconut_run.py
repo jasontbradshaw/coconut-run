@@ -9,7 +9,6 @@ from sprites import Avatar
 from sprites import Coconut
 from sprites import Banana
 from game import Level
-from game import Music
 from libcocorun import Expression
 
 # constants
@@ -59,9 +58,15 @@ def main(argv=None):
             0, 0, width, height - 40)
     expr = Expression()
 
-    bg_music = Music(audio_folder + 'sample_music.ogg')
-    bg_music.play()
-
+    #initialize mixer/music/sounds
+    pygame.mixer.pre_init(44100, -16, 2, 512)
+    pygame.mixer.init()
+    bg_music = pygame.mixer.Sound(audio_folder + 'sample_music.ogg')
+    hit_sound = pygame.mixer.Sound(audio_folder + 'pop2.wav')
+    
+    channel = bg_music.play()
+    
+    
     # load surfaces
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
     coconut_surf = pygame.image.load(coconut_file).convert_alpha()
@@ -157,6 +162,7 @@ def main(argv=None):
                     coconuts, False)
             for c in coconuts_collide_list:
                 if c.actionable(avatar):
+                    Channel = hit_sound.play()
                     print("Hit Coconut w/ expression: " + str(c.expr))
                     expr += c.expr
                     try:
