@@ -9,7 +9,8 @@ from sprites import Avatar
 from sprites import Coconut
 from sprites import Banana
 from game import Level
-from libcocorun import Expression
+from libcocorun import Expr
+import libcocorun
 
 # constants
 COLORKEY = 0xFF00FF # transparent color
@@ -29,6 +30,9 @@ droppable_folder = graphics_folder + 'droppable/'
 icons_folder = graphics_folder + 'icons/'
 items_folder = graphics_folder + 'items/'
 fonts_folder = resource_folder + 'fonts/'
+
+COLOR_BLACK = (0, 0, 0)
+COLOR_WHITE = (255, 255, 255)
 
 # GUI window
 size = width, height = 640, 480
@@ -56,7 +60,7 @@ def main(argv=None):
             120, 0.015, 0.0001, 0.75,
             10, 15,
             0, 0, width, height - 40)
-    expr = Expression()
+    expr = Expr()
 
     #initialize mixer/music/sounds
     pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -85,7 +89,7 @@ def main(argv=None):
 
     # text
     default_font = pygame.font.Font(fonts_folder + "anmari.ttf", 26)
-    COLOR_BLACK = (0, 0, 0)
+    expr_font = pygame.font.Font(fonts_folder + "Justus-Roman.ttf", 26)
     
     fps_display_pos = (lvl.right - 140, 20)
     level_display_pos = (lvl.right / 2 - 50, 20)
@@ -130,6 +134,9 @@ def main(argv=None):
                     elif event.key == pygame.K_RIGHT:
                         if avatar.right_pos() < lvl.right:
                             avatar.move(0, avatar.speed)
+                    elif event.key == pygame.K_d:
+                        if len(expr) > 0:
+                            expr.pop()
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
@@ -164,7 +171,8 @@ def main(argv=None):
                 if c.actionable(avatar):
                     Channel = hit_sound.play()
                     print("Hit Coconut w/ expression: " + str(c.expr))
-                    expr += c.expr
+                    expr.append(c.expr)
+                    print(str(expr))
                     try:
                         print(str(expr) + " = " + str(expr.eval()))
                     except: pass
@@ -203,6 +211,8 @@ def main(argv=None):
         
         for c in coconuts:
             screen.blit(c.image, c.get_delta(delta))
+            screen.blit(expr_font.render(str(c.expr), True, COLOR_WHITE,
+              COLOR_BLACK), c.get_delta(delta))
 
         for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
@@ -210,32 +220,28 @@ def main(argv=None):
         screen.blit(avatar.image, avatar.get_delta(delta))
         blit_lives_icon(screen, avatar.lives)
 
+        # draw expression
+        expr_txt = ""
+        if expr.valid():
+          expr_txt += str(expr.eval()) + " = "
+        expr_txt += str(expr)
+        screen.blit(expr_font.render(expr_txt, True, COLOR_BLACK), (40, 450))
+
         # draw text
-        screen.blit(default_font.render(lvl.name, 1, COLOR_BLACK),
-                level_display_pos)
-        screen.blit(default_font.render('FPS: %.1f' % fps, 1, COLOR_BLACK),
-                                        fps_display_pos)
+        screen.blit(default_font.render(lvl.name, True, COLOR_BLACK),
+            level_display_pos)
+        screen.blit(default_font.render('FPS: %.1f' % fps, True,
+          COLOR_BLACK), fps_display_pos)
         #screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
         #                               COLOR_BLACK), lives_display_pos)
-        screen.blit(default_font.render('Points: %d' % avatar.points, 1,
-                                        COLOR_BLACK), points_display_pos)
+        screen.blit(default_font.render('Points: %d' % avatar.points,
+          True, COLOR_BLACK), points_display_pos)
         # draw debug text
-        screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq, 1,
-                                        COLOR_BLACK), (20, 80))
-        
+        screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq,
+          True, COLOR_BLACK), (20, 80))
+
         pygame.display.flip()
         
-def randexpr():
-    operators = ["+", "-"]
-    operator_freq = .4
-
-    a = 1
-    b = 10
-
-    if random.random() < operator_freq:
-        return Expression([operators[random.randint(0, len(operators)-1)]])
-
-    return Expression([random.randint(a, b)])
 
 def blit_lives_icon(screen, lives):
     heart_file = icons_folder + 'heart.png'
@@ -269,6 +275,13 @@ def full_screen_image(img_filename):
         clk = pygame.time.Clock()
         clk.tick()
 
+
+def randexpr(min=0, max=10, operator_freq=0.25):
+    if random.random() < operator_freq:
+        # make operator
+        return Expr([libcocorun.operators[random.randint(0,
+          len(libcocorun.operators)-1)]])
+    return Expr([str(random.randint(min, max))])
 
 if __name__ == "__main__":
     pygame.init()
