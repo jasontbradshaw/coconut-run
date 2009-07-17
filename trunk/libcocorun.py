@@ -111,7 +111,7 @@ class Expr(list):
                     if i > 0 and not ((type) == Op and left.optr()):
                         return False
                 else:
-                    raise InvalidExpr("Expression Engine: operator not a\\
+                    raise InvalidExpr("Expression Engine: operator not a\
                             binary or unary operator!")
                     print "An operator not in binary and not in unary!"
             elif type(e) == Op and e.oprnd():
@@ -126,7 +126,7 @@ class Expr(list):
                     return False
             else:
                 # screwed up!
-                raise InvalidExpr("Expression Engine: not an operator, \\
+                raise InvalidExpr("Expression Engine: not an operator, \
                 operand, or expression!")
         return True
 
