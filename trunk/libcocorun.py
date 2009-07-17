@@ -44,6 +44,10 @@ class Expr(list):
         
         """
         if len(self) == 0:
+            return False
+        if (len(self) == 1 and type(self[0]) == Expr and type((self[0])[0])
+            == str and (self[0])[0] not in operators):
+            # Expr consist of one Expr which is a number
             return True
         if type(self) is str:
             # turtle all the way down to strings
@@ -71,16 +75,16 @@ class Expr(list):
                     # invalid unary operator
                     return False
             else: # an expression
-                if len(e) == 1 and e not in operators:
+                if type(e) == str and len(e) == 1 and e not in operators:
                     # a number
                     continue
                 if not e.valid():
                     return False
-                elif i == 0 and str(right) not in binary_ops:
+                if i == 0 and str(right) not in binary_ops:
                     return False
-                elif i == len(self)-1 and str(left) not in operators:
+                if i == len(self)-1 and str(left) not in operators:
                     return False
-                elif (i != 0 and i != len(self)-1 and (str(left) not in
+                if (i != 0 and i != len(self)-1 and (str(left) not in
                     operators or str(right) not in operators)):
                     return False
         return True
