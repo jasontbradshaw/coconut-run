@@ -177,7 +177,7 @@ def main(argv=None):
                         print(str(expr) + " = " + str(expr.eval()))
                     except: pass
                     if avatar.lives > 0:
-                        avatar.lives -= 1
+                        pass # don't lose lives
                     else:
                         # go to game over screen and quit
                         bg_music.fadeout(3000)
