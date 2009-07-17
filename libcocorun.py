@@ -28,6 +28,10 @@ class Op(str):
     def unary_optr(self):
         return self in unary_optrs
 
+    # self is not an Expr
+    def expr(self):
+        return False
+
 class Expr(list):
     """
     An Expr is used to hold a mathematical (though it can be any valid
@@ -88,47 +92,83 @@ class Expr(list):
             if type(e) == Expr:
                 if not e.valid():
                     return False
+
+                # e is a valid expression, so make sure that it is flanked by
+                # correct type of operators:
+
                 if i == 0 and not (type(right) == Op and right.binary_optr()):
+                    # first element, but right element isn't a binary optr
                     return False
                 if i == len(self)-1 and not (type(left) == Op and left.optr()):
+                    # last element, but not left not an operator
                     return False
                 if (i != 0 and i != len(self)-1 and not
-                    (type(left) == Op and type(right) == Op and
-                    left.optr() and right.binary_optr())):
+                (type(left) == Op and type(right) == Op and
+                left.optr() and right.binary_optr())):
+                    # not at either ends, but not surrounded by proper optrs
                     return False
             elif type(e) == Op and e.optr():
+                # e is an operator (e.g. +, *, sin, etc)
                 if e.binary_optr():
+                    # examples: +, *, /
                     if i == 0 or i == len(self)-1:
+                        # no operands to operator on
                         return False
                     if (not (((type(right) == Op and right.oprnd()) or
                         (type(right) == Expr and right.valid())) and
                         ((type(left) == Op and left.oprnd()) or
                         (type(left) == Expr and left.valid())))):
+                        # binary operators not flanked by valid operands or
+                        # expressions
                         return False
                 elif e.unary_optr():
+                    # examples: sin(), exp()
                     if i == len(self)-1:
+                        # doesn't have anythign to operator on
                         return False
                     if i > 0 and not ((type) == Op and left.optr()):
+                        # not first, but left not an operator
+                        return False
+                    if (not(type(right) == Op and right.oprnd() or
+                        type(right) == Expr and right.expr())):
+                        # right is not an operand or a valid expression
                         return False
                 else:
-                    raise InvalidExpr("Expression Engine: operator not a\
-                            binary or unary operator!")
-                    print "An operator not in binary and not in unary!"
+                    s = "Expression Engine: operator not a binary or unary"
+                    s += " operator!"
+                    raise InvalidExpr(s)
             elif type(e) == Op and e.oprnd():
+                # an operand (e.g. 3, 3.1415, -42)
                 if len(self) == 1:
+                    # expression with one element is valid if that element is
+                    # an operand
                     return True
                 if i == 0 and not (type(right) == Op and right.binary_optr()):
+                    # first element, but right side is not a binary operator
                     return False
                 if i == len(self)-1 and not (type(left) == Op and left.optr()):
+                    # last element, but left side is not an operator
                     return False
                 if (i != 0 and i != len(self)-1 and not (type(left) == Op and
-                    left.optr() and type(right) == Op and right.optr())):
+                    left.optr() and type(right) == Op and right.binary_optr())):
+                    # not flanked by proper operators
                     return False
             else:
-                # screwed up!
-                raise InvalidExpr("Expression Engine: not an operator, \
-                operand, or expression!")
+                s = "Expression Engine: not an operator, operand, or expression!"
+                raise InvalidExpr(s)
         return True
+    
+    def expr(self):
+        # self is an Expr
+        return True
+    def oprnd(self):
+        return False
+    def binary_optr(self):
+        return False
+    def unary_optr(self):
+        return False
+    def optr(self):
+        return False
 
     def __str__(self):
         # TODO: if unary operator, add ()'s around the next expression.
