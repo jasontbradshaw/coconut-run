@@ -171,7 +171,7 @@ class Expr(list):
         return False
 
     def __str__(self):
-        # TODO: if unary operator, add ()'s around the next expression.
+        """formats math expression for Python's eval()."""
         add_right_paren = 0
         out = ""
         for e in self:
@@ -187,6 +187,5 @@ class Expr(list):
                 out += ")" * add_right_paren
                 add_right_paren = 0
         return out
-
 class InvalidExpr(Exception):
     pass
