@@ -2,10 +2,37 @@ import pygame
 import math
 import copy
 from libcocorun import Expr
+from game import StateMachine
+
+class Animatable:
+    """
+    list of States, each element in this list maps (via index) to:
+    """
+    def __init__(self, state_machine)
+        self.sm = state_machine
+        self.frames = [None]*len(self.sm) # user must set frames later
+    def set_frames(self, state, frames):
+        # frames should be a StateMachine
+        if type(state) == int:
+            self.frames[state] = frames
+        else:
+            self.frames[self.sm.index(state)] = frames
+    def change(self, s):
+        return self.sm.change(s)
+    def current(self, number=False):
+        return self.sm.current(number)
+    def current_frames(self):
+        return self.frames[self.sm.current(True)]
+    def next(self):
+        # for the current state frames, move to the next frame
+        return self.current_frames().next()
+    def image(self):
+        # for the current state frames, returns the current Surface
+        img = self.current_frames().current()
 
 class Movable(pygame.sprite.Sprite):
-    def __init__(self, surfaces, init_pos = (0, 0),
-                 dir = 0, vel = 0, speed = -1):
+    def __init__(self, surfaces, init_pos =(0, 0),
+            dir=0, vel=0, speed=-1):
         pygame.sprite.Sprite.__init__(self)
         
         self.image = None
