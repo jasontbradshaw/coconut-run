@@ -119,8 +119,9 @@ class Expr(list):
                     if i == 0 or i == len(self)-1:
                         # no operands to operator on
                         return False
-                    if (not (((right.oprnd()) or right.valid()) and
-                        left.oprnd() or left.valid())):
+                    if (not (right.oprnd() or right.expr() and
+                        right.valid()) and (left.oprnd() or left.expr() and
+                        left.valid())):
                         # binary operators not flanked by valid operands or
                         # expressions
                         return False
