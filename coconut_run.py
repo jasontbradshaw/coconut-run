@@ -45,6 +45,8 @@ def main(argv=None):
 
     # resources
     avatar_file = avatar_folder + 'avatar.png'
+    coco1 = avatar_folder + 'pain1.png'
+    coco2 = avatar_folder + 'pain2.png'
     #coconut_file = droppable_folder + 'coconut.png'
     coconut_file = icons_folder + 'coconut_highres.png'
     #banana_file = droppable_folder + 'banana.png'
@@ -75,6 +77,9 @@ def main(argv=None):
     
     # load surfaces
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
+    coco_surf1 = pygame.image.load(coco1).convert_alpha()
+    coco_surf2 = pygame.image.load(coco2).convert_alpha()
+    coco_anim = [coco_surf1, coco_surf2]
     coconut_surf = pygame.image.load(coconut_file).convert_alpha()
     banana_surf = pygame.image.load(banana_file).convert_alpha() 
 
@@ -82,7 +87,7 @@ def main(argv=None):
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
     avatar_lives = 5
-    avatar = Avatar(avatar_surf, (0, lvl.bottom),
+    avatar = Avatar(coco_anim, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0)
 
     # make groups
@@ -125,6 +130,7 @@ def main(argv=None):
             ############
 
             avatar.update()
+            avatar.next_frame()
             
             # input handling
             for event in pygame.event.get():

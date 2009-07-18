@@ -34,3 +34,35 @@ class Level:
         # items possibly dropped
         # [coconuts, bananas, ...]
         self.items_dropped = items_dropped
+
+class StateMachine:
+    def __init__(self, states = [], start = 0):
+        self.states = states
+        self.start = start
+        self.curr = start
+
+    def num_states(self):
+        return len(self.states)
+
+    def current(self, number=False):
+        if number:
+            return self.curr
+        return self.states[self.curr]
+
+    def change(self, s):
+        if type(s) == str:
+            try:
+                self.curr = self.states.index(s)
+                return True
+            except:
+                return False
+        elif type(s) == int:
+            if s >= 0 and s < self.num_states():
+                self.curr = s
+                return True
+            return False
+        return False
+
+    def reset(self):
+        self.curr = self.start
+
