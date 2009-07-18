@@ -57,6 +57,7 @@ def main(argv=None):
 
     # keyboard delay before key repeats
     pygame.key.set_repeat(10, 0)
+    already_pop = True  # Boolean to make sure d press only deletes 1 Op
 
     # level
     lvl = Level("Level 1", backdrops_folder + "landscape.png",
@@ -136,6 +137,7 @@ def main(argv=None):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+                # Key Down
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         sys.exit()
@@ -145,12 +147,16 @@ def main(argv=None):
                     elif event.key == pygame.K_RIGHT:
                         if avatar.right_pos() < lvl.right:
                             avatar.move(0, avatar.speed)
-                    elif event.key == pygame.K_d:
+                    if event.key == pygame.K_d and already_pop:
                         if len(expr) > 0:
                             expr.pop()
+                            already_pop = False
+                # Key 
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
+                    if event.key == pygame.K_d:
+                        already_pop = True
 
             # coconut creation
             if random.random() < lvl.blk_freq:
@@ -304,4 +310,4 @@ def randexpr(min=0, max=10, operator_freq=0.25):
 if __name__ == "__main__":
     pygame.init()
     sys.exit(main())
-
+event.key == pygame.K_d
