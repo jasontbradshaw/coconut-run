@@ -2,7 +2,7 @@ import random
 import math
 
 binary_optrs = ['+', '-', '*', '/', '**', '%']
-unary_optrs = ['sin']
+unary_optrs = ['math.sin', 'math.exp', 'math.log']
 operators = binary_optrs #binary_optrs & unary_ops
 
 class Op(str):
@@ -69,7 +69,7 @@ class Expr(list):
               left(e) and right(e) is oprnd or valid expr
             e is unary optr ==>
               e not first ==> left(e) is optr
-              right(e) is oprnd or valid expr
+              right(e) is oprnd or valid expr or unary optr
           e is oprnd ==>
             e is first ==> right(e) is binary optr
             e is last ==> left(e) is optr
@@ -89,35 +89,30 @@ class Expr(list):
             if i < len(self)-1:
                 right = self[i+1]
 
-            if type(e) == Expr:
+            if e.expr():
                 if not e.valid():
                     return False
 
                 # e is a valid expression, so make sure that it is flanked by
                 # correct type of operators:
 
-                if i == 0 and not (type(right) == Op and right.binary_optr()):
-                    # first element, but right element isn't a binary optr
+                if i == 0 and not right.binary_optr():
                     return False
-                if i == len(self)-1 and not (type(left) == Op and left.optr()):
-                    # last element, but not left not an operator
+                if i == len(self)-1 and not left.optr():
                     return False
-                if (i != 0 and i != len(self)-1 and not
-                (type(left) == Op and type(right) == Op and
-                left.optr() and right.binary_optr())):
+                if (i != 0 and i != len(self)-1 and not (left.optr() and
+                    right.binary_optr())):
                     # not at either ends, but not surrounded by proper optrs
                     return False
-            elif type(e) == Op and e.optr():
+            elif e.optr():
                 # e is an operator (e.g. +, *, sin, etc)
                 if e.binary_optr():
                     # examples: +, *, /
                     if i == 0 or i == len(self)-1:
                         # no operands to operator on
                         return False
-                    if (not (((type(right) == Op and right.oprnd()) or
-                        (type(right) == Expr and right.valid())) and
-                        ((type(left) == Op and left.oprnd()) or
-                        (type(left) == Expr and left.valid())))):
+                    if (not (((right.oprnd()) or right.valid()) and
+                        left.oprnd() or left.valid())):
                         # binary operators not flanked by valid operands or
                         # expressions
                         return False
@@ -126,31 +121,28 @@ class Expr(list):
                     if i == len(self)-1:
                         # doesn't have anythign to operator on
                         return False
-                    if i > 0 and not ((type) == Op and left.optr()):
-                        # not first, but left not an operator
+                    if i > 0 and not left.optr():
                         return False
-                    if (not(type(right) == Op and right.oprnd() or
-                        type(right) == Expr and right.expr())):
-                        # right is not an operand or a valid expression
+                    if not(right.oprnd() or right.expr() or right.unary_optr()):
                         return False
                 else:
                     s = "Expression Engine: operator not a binary or unary"
                     s += " operator!"
                     raise InvalidExpr(s)
-            elif type(e) == Op and e.oprnd():
+            elif e.oprnd():
                 # an operand (e.g. 3, 3.1415, -42)
                 if len(self) == 1:
                     # expression with one element is valid if that element is
                     # an operand
                     return True
-                if i == 0 and not (type(right) == Op and right.binary_optr()):
+                if i == 0 and not right.binary_optr():
                     # first element, but right side is not a binary operator
                     return False
-                if i == len(self)-1 and not (type(left) == Op and left.optr()):
+                if i == len(self)-1 and not left.optr():
                     # last element, but left side is not an operator
                     return False
-                if (i != 0 and i != len(self)-1 and not (type(left) == Op and
-                    left.optr() and type(right) == Op and right.binary_optr())):
+                if (i != 0 and i != len(self)-1 and not (left.optr() and
+                    right.binary_optr())):
                     # not flanked by proper operators
                     return False
             else:
@@ -172,14 +164,21 @@ class Expr(list):
 
     def __str__(self):
         # TODO: if unary operator, add ()'s around the next expression.
+        add_right_paren = False
         out = ""
         for e in self:
-            if type(e) == Expr:
+            if e.expr():
                 out += "(" + str(e) + ")"
+            elif e.unary_optr():
+                out += str(e) + "("
+                add_right_paren = True
+                continue
             else:
                 out += str(e)
+            if add_right_paren:
+                out += ")"
+                add_right_paren = False
         return out
-
 
 class InvalidExpr(Exception):
     pass
