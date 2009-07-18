@@ -8,7 +8,7 @@ class Animatable:
     """
     list of States, each element in this list maps (via index) to:
     """
-    def __init__(self, state_machine)
+    def __init__(self, state_machine):
         self.sm = state_machine
         self.frames = [None]*len(self.sm) # user must set frames later
     def set_frames(self, state, frames):
