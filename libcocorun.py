@@ -170,8 +170,9 @@ class Expr(list):
     def optr(self):
         return False
 
+    # Converts list of Ops (an Expr) to a math equation
     def __str__(self):
-        """formats math expression for Python's eval()."""
+        """Converts Expr list to math expression"""
         add_right_paren = 0
         out = ""
         for e in self:
