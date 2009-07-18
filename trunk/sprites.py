@@ -4,11 +4,21 @@ import copy
 from libcocorun import Expr
 
 class Movable(pygame.sprite.Sprite):
-    def __init__(self, surface, init_pos = (0, 0),
+    def __init__(self, surfaces, init_pos = (0, 0),
                  dir = 0, vel = 0, speed = -1):
         pygame.sprite.Sprite.__init__(self)
         
-        self.image = surface
+        self.image = None
+        self.surfaces = None
+        if type(surfaces) == list:
+            self.image = surfaces[0]
+            self.surfaces = surfaces
+        elif type(surfaces) == pygame.Surface:
+            self.image = surfaces
+        else:
+            raise Exception("Movable: not a Surface or list of Surfaces.")
+        self.frame_count = 0
+
         self.rect = self.image.get_rect()
         self.rect.bottomleft = init_pos
 
@@ -18,6 +28,19 @@ class Movable(pygame.sprite.Sprite):
         self.speed = speed # how fast we want this sprite to move
         
         self.prev_rect = copy.deepcopy(self.rect)
+
+    def next_frame(self):
+        if type(self.surfaces) == list:
+            self.image = self.surfaces[self.frame()]
+            self.frame_count += 1
+
+    def num_frames(self):
+        if type(self.surfaces) == list:
+            return len(self.surfaces)
+        return 1
+
+    def frame(self):
+        return self.frame_count % self.num_frames()
 
     def position(self):
         """
@@ -61,9 +84,9 @@ class Movable(pygame.sprite.Sprite):
         pass
     
 class Avatar(Movable):
-    def __init__(self, surface, init_pos = (0, 0), dir = 0, vel = 0, speed = 30,
-                 lives = 0, points = 0):
-        Movable.__init__(self, surface, init_pos, dir, vel, speed)
+    def __init__(self, surfaces, init_pos = (0, 0), dir = 0, vel = 0, speed = 30,
+            lives = 0, points = 0):
+        Movable.__init__(self, surfaces, init_pos, dir, vel, speed)
         
         self.lives = lives
         self.points = points
