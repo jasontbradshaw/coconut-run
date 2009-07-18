@@ -57,11 +57,12 @@ def main(argv=None):
     pygame.key.set_repeat(10, 0)
 
     # level
-    lvl = Level("Cocoana", backdrops_folder + "landscape.png",
+    lvl = Level("Level 1", backdrops_folder + "landscape.png",
             120, 0.015, 0.0001, 0.75,
             10, 15,
             0, 0, width, height - 40)
     expr = Expr()
+    time_limit = lvl.time_limit
 
     #initialize mixer/music/sounds
     pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -80,7 +81,7 @@ def main(argv=None):
     # set up avatar
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
-    avatar_lives = 20
+    avatar_lives = 5
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0)
 
@@ -96,6 +97,7 @@ def main(argv=None):
     level_display_pos = (lvl.right / 2 - 50, 20)
     lives_display_pos = (20, 20)
     points_display_pos = (20, 50)
+    time_display_pos = (20, 80)
 
     # menus
     full_screen_image(backdrops_folder + "main_menu.png")
@@ -109,6 +111,8 @@ def main(argv=None):
     next_logic_tick = pygame.time.get_ticks()
     logical_loops = 0
     delta = 0.0 # used for interpolation when drawing
+
+    clk.tick() # Allows the seconds passed to be calculated
 
     while not game_over:
 
@@ -200,7 +204,7 @@ def main(argv=None):
         # DRAWING  #
         ############
 
-        clk.tick()
+        time_limit = time_limit - ( clk.tick() * .001 )
         fps = clk.get_fps()
 
         delta = ((1.0 * pygame.time.get_ticks() + skip_ticks - next_logic_tick)
@@ -228,18 +232,24 @@ def main(argv=None):
         expr_txt += str(expr)
         screen.blit(expr_font.render(expr_txt, True, COLOR_BLACK), (40, 450))
 
-        # draw text
+        # draw Level Name
         screen.blit(default_font.render(lvl.name, True, COLOR_BLACK),
             level_display_pos)
+        # draw FPS
         screen.blit(default_font.render('FPS: %.1f' % fps, True,
           COLOR_BLACK), fps_display_pos)
+        # draw lives
         #screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
         #                               COLOR_BLACK), lives_display_pos)
+        # draw Points
         screen.blit(default_font.render('Points: %d' % avatar.points,
           True, COLOR_BLACK), points_display_pos)
+        # draw Time
+        screen.blit(default_font.render('Time: %d sec' % time_limit,
+          True, COLOR_BLACK), time_display_pos)
         # draw debug text
         screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq,
-          True, COLOR_BLACK), (20, 80))
+          True, COLOR_BLACK), (20, 110))
 
         pygame.display.flip()
         
