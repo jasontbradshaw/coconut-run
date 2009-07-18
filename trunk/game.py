@@ -35,14 +35,25 @@ class Level:
         # [coconuts, bananas, ...]
         self.items_dropped = items_dropped
 
-class StateMachine:
-    def __init__(self, states = [], start = 0):
+class StateMachine(list):
+    """
+    Describes a set of states that one can traverse through.
+    """
+    def __init__(self, states, start=0):
         self.states = states
         self.start = start
         self.curr = start
 
-    def num_states(self):
-        return len(self.states)
+    def add(self, state):
+        self.states.append(state)
+
+    def remove(self, state):
+        # WARNING: untested funct
+        if type(state) == int:
+            # an int, remove that index
+            del self.states[state]
+        else:
+            self.states.remove(state)
 
     def current(self, number=False):
         if number:
@@ -50,19 +61,32 @@ class StateMachine:
         return self.states[self.curr]
 
     def change(self, s):
-        if type(s) == str:
+        """
+        Changes the state to s.
+        Returns True if state was changed, False if given illegal state
+        """
+        if type(s) == int:
+            if s >= 0 and s < len(self):
+                self.curr = s
+                return True
+        else:
             try:
                 self.curr = self.states.index(s)
                 return True
             except:
-                return False
-        elif type(s) == int:
-            if s >= 0 and s < self.num_states():
-                self.curr = s
-                return True
-            return False
+                pass
         return False
+
+    def next(self):
+        """
+        Moves to the next state. Loops back around if at end of states list."""
+        self.curr += 1
+        if self.curr >= len(self):
+            self.curr = 0
+        return self.curr
 
     def reset(self):
         self.curr = self.start
-
+    
+    def __len__(self):
+        return len(self.states)
