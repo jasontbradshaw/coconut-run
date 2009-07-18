@@ -3,7 +3,7 @@ import math
 
 binary_optrs = ['+', '-', '*', '/', '**', '%']
 unary_optrs = ['math.sin', 'math.exp', 'math.log']
-operators = binary_optrs #binary_optrs & unary_ops
+operators = binary_optrs + unary_optrs
 
 class Op(str):
     """
@@ -68,12 +68,20 @@ class Expr(list):
               e not first or last
               left(e) and right(e) is oprnd or valid expr
             e is unary optr ==>
-              e not first ==> left(e) is optr
-              right(e) is oprnd or valid expr or unary optr
+              e not first ==> left(e) is binary optr
+              right(e) is oprnd or valid expr
           e is oprnd ==>
             e is first ==> right(e) is binary optr
             e is last ==> left(e) is optr
             e is not first or last ==> left(e) and right(e) is optr
+
+        Note: the unary operator is currently limited. A unary operator can
+        only have a binary operator or nothing to its left. It can only have a
+        valid expression or an operand to its right.
+
+        This is a limitation of __str__() not being able to put closing
+        parenthesis properly. We would need a stack to do this, but is this
+        something we want?
         """
 
         if len(self) == 0:
@@ -121,9 +129,9 @@ class Expr(list):
                     if i == len(self)-1:
                         # doesn't have anythign to operator on
                         return False
-                    if i > 0 and not left.optr():
+                    if i > 0 and not left.binary_optr():
                         return False
-                    if not(right.oprnd() or right.expr() or right.unary_optr()):
+                    if not(right.oprnd() or right.expr()):
                         return False
                 else:
                     s = "Expression Engine: operator not a binary or unary"
@@ -164,20 +172,20 @@ class Expr(list):
 
     def __str__(self):
         # TODO: if unary operator, add ()'s around the next expression.
-        add_right_paren = False
+        add_right_paren = 0
         out = ""
         for e in self:
             if e.expr():
                 out += "(" + str(e) + ")"
             elif e.unary_optr():
                 out += str(e) + "("
-                add_right_paren = True
+                add_right_paren += 1
                 continue
             else:
                 out += str(e)
-            if add_right_paren:
-                out += ")"
-                add_right_paren = False
+            if add_right_paren > 0:
+                out += ")" * add_right_paren
+                add_right_paren = 0
         return out
 
 class InvalidExpr(Exception):
