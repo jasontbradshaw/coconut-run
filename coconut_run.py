@@ -9,6 +9,7 @@ from sprites import Avatar
 from sprites import Coconut
 from sprites import Banana
 from game import Level
+from game import StateMachine
 from libcocorun import Expr
 from libcocorun import Op
 import libcocorun
@@ -44,9 +45,6 @@ def main(argv=None):
         argv = sys.argv
 
     # resources
-    avatar_file = avatar_folder + 'avatar.png'
-    coco1 = avatar_folder + 'pain1.png'
-    coco2 = avatar_folder + 'pain2.png'
     #coconut_file = droppable_folder + 'coconut.png'
     coconut_file = icons_folder + 'coconut_highres.png'
     #banana_file = droppable_folder + 'banana.png'
@@ -60,10 +58,14 @@ def main(argv=None):
     already_pop = True  # Boolean to make sure d press only deletes 1 Op
 
     # level
-    lvl = Level("Level 1", backdrops_folder + "landscape.png",
-            120, 0.015, 0.0001, 0.75,
-            10, 15,
-            0, 0, width, height - 40)
+    lvl = Level(name = "Level 1",
+            bg_file = backdrops_folder + "landscape.png",
+            time_limit = 120,
+            blk_freq_min = 0.015,
+            blk_freq_max = 0.10,
+            blk_freq_inc = 0.0001,
+            min_vel = 5, max_vel = 10,
+            left = 0, top = 0, right = width, bottom = height - 40)
     expr = Expr()
     time_limit = lvl.time_limit
 
@@ -77,19 +79,28 @@ def main(argv=None):
     
     
     # load surfaces
-    avatar_surf = pygame.image.load(avatar_file).convert_alpha()
-    coco_surf1 = pygame.image.load(coco1).convert_alpha()
-    coco_surf2 = pygame.image.load(coco2).convert_alpha()
-    coco_anim = [coco_surf1, coco_surf2]
     coconut_surf = pygame.image.load(coconut_file).convert_alpha()
     banana_surf = pygame.image.load(banana_file).convert_alpha() 
 
     # set up avatar
+    avatar_file = avatar_folder + 'avatar.png'
+    coco1 = avatar_folder + 'pain1.png'
+    coco2 = avatar_folder + 'pain2.png'
+
+    avatar_surf = pygame.image.load(avatar_file).convert_alpha()
+    coco_surf1 = pygame.image.load(coco1).convert_alpha()
+    coco_surf2 = pygame.image.load(coco2).convert_alpha()
+    coco_still = StateMachine([avatar_surf])
+    coco_pain = StateMachine([coco_surf1, coco_surf2])
+
+    avatar_sm = StateMachine(["still", "bored"], start=0)
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
     avatar_lives = 5
-    avatar = Avatar(coco_anim, (0, lvl.bottom),
-                    0, 0, avatar_speed, avatar_lives, 0)
+    avatar = Avatar(avatar_surf, (0, lvl.bottom),
+                    0, 0, avatar_speed, avatar_lives, 0, avatar_sm)
+    avatar.set_frames(0, coco_still)
+    avatar.set_frames(1, coco_pain)
 
     # make groups
     coconuts = pygame.sprite.Group()
@@ -131,7 +142,7 @@ def main(argv=None):
             ############
 
             avatar.update()
-            avatar.next_frame()
+            avatar.update_image()
             
             # input handling
             for event in pygame.event.get():
@@ -148,6 +159,7 @@ def main(argv=None):
                         if avatar.right_pos() < lvl.right:
                             avatar.move(0, avatar.speed)
                     if event.key == pygame.K_d and already_pop:
+                        avatar.change("bored")
                         if len(expr) > 0:
                             expr.pop()
                             already_pop = False
@@ -156,6 +168,7 @@ def main(argv=None):
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
                     if event.key == pygame.K_d:
+                        avatar.change("still")
                         already_pop = True
 
             # coconut creation

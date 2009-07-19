@@ -11,6 +11,8 @@ class Animatable:
     def __init__(self, state_machine):
         self.sm = state_machine
         self.frames = [None]*len(self.sm) # user must set frames later
+        self.mspf = 200 # ms per frame
+        self.next_time = pygame.time.get_ticks()
     def set_frames(self, state, frames):
         # frames should be a StateMachine
         if type(state) == int:
@@ -25,26 +27,20 @@ class Animatable:
         return self.frames[self.sm.current(True)]
     def next(self):
         # for the current state frames, move to the next frame
-        return self.current_frames().next()
-    def image(self):
+        current_time = pygame.time.get_ticks()
+        if current_time >= self.next_time:
+            self.next_time += self.mspf
+            return self.current_frames().next()
+    def current_surf(self):
         # for the current state frames, returns the current Surface
-        img = self.current_frames().current()
+        return self.current_frames().current()
 
 class Movable(pygame.sprite.Sprite):
-    def __init__(self, surfaces, init_pos =(0, 0),
+    def __init__(self, surface, init_pos =(0, 0),
             dir=0, vel=0, speed=-1):
         pygame.sprite.Sprite.__init__(self)
         
-        self.image = None
-        self.surfaces = None
-        if type(surfaces) == list:
-            self.image = surfaces[0]
-            self.surfaces = surfaces
-        elif type(surfaces) == pygame.Surface:
-            self.image = surfaces
-        else:
-            raise Exception("Movable: not a Surface or list of Surfaces.")
-        self.frame_count = 0
+        self.image = surface
 
         self.rect = self.image.get_rect()
         self.rect.bottomleft = init_pos
@@ -55,19 +51,6 @@ class Movable(pygame.sprite.Sprite):
         self.speed = speed # how fast we want this sprite to move
         
         self.prev_rect = copy.deepcopy(self.rect)
-
-    def next_frame(self):
-        if type(self.surfaces) == list:
-            self.image = self.surfaces[self.frame()]
-            self.frame_count += 1
-
-    def num_frames(self):
-        if type(self.surfaces) == list:
-            return len(self.surfaces)
-        return 1
-
-    def frame(self):
-        return self.frame_count % self.num_frames()
 
     def position(self):
         """
@@ -110,13 +93,17 @@ class Movable(pygame.sprite.Sprite):
         """
         pass
     
-class Avatar(Movable):
-    def __init__(self, surfaces, init_pos = (0, 0), dir = 0, vel = 0, speed = 30,
-            lives = 0, points = 0):
-        Movable.__init__(self, surfaces, init_pos, dir, vel, speed)
-        
+class Avatar(Movable, Animatable):
+    def __init__(self, surface, init_pos = (0, 0), dir = 0, vel = 0, speed = 30,
+            lives = 0, points = 0, states = []):
+        Movable.__init__(self, surface, init_pos, dir, vel, speed)
+        Animatable.__init__(self, states) 
         self.lives = lives
         self.points = points
+
+    def update_image(self):
+        self.image = self.current_surf()
+        self.next()
 
     def update(self):
         self.vel = 0.0
