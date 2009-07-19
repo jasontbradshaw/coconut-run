@@ -161,19 +161,21 @@ def main(argv=None):
                     elif event.key == pygame.K_RIGHT:
                         if avatar.right_pos() < lvl.right:
                             avatar.move(0, avatar.speed)
-                    if event.key == pygame.K_d and already_pop and banana_points > 1:
+                    if (event.key == pygame.K_d and already_pop
+                            and banana_points >= 1):
                         avatar.change("bored")
                         if len(expr) > 0:
                             expr.pop()
                             already_pop = False
+                            banana_points = banana_points - 1
                 # Key 
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
-                    if event.key == pygame.K_d and banana_points > 0:
+                    if event.key == pygame.K_d:
                         avatar.change("still")
                         already_pop = True
-                        banana_points = banana_points - 1
+                        
 
             # coconut creation
             if random.random() < lvl.blk_freq:
