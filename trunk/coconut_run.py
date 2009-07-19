@@ -44,6 +44,12 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
+    DEBUG_PLAY = False
+    for a in argv:
+        if a == "d" or a == "debug":
+            DEBUG_PLAY = True
+            print "DEBUG_PLAY set."
+
     # resources
     #coconut_file = droppable_folder + 'coconut.png'
     coconut_file = icons_folder + 'coconut_highres.png'
@@ -61,7 +67,7 @@ def main(argv=None):
             bg_file = backdrops_folder + "landscape.png",
             time_limit = 120,
             blk_freq_min = 0.015,
-            blk_freq_max = 0.10,
+            blk_freq_max = 0.02,
             blk_freq_inc = 0.0001,
             min_vel = 5, max_vel = 10,
             left = 0, top = 0, right = width, bottom = height - 40)
@@ -92,14 +98,18 @@ def main(argv=None):
     coco_still = StateMachine([avatar_surf])
     coco_pain = StateMachine([coco_surf1, coco_surf2])
 
-    avatar_sm = StateMachine(["still", "bored"], start=0)
+    avatar_sm = StateMachine(["still", "right", "left", "catch", "throw"],
+            start=0)
     avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
     avatar_lives = 5
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0, avatar_sm)
     avatar.set_frames(0, coco_still)
-    avatar.set_frames(1, coco_pain)
+    avatar.set_frames(1, coco_still)
+    avatar.set_frames(2, coco_still)
+    avatar.set_frames(3, coco_still)
+    avatar.set_frames(4, coco_pain)
 
     # make groups
     coconuts = pygame.sprite.Group()
@@ -120,7 +130,7 @@ def main(argv=None):
     game_over = False
     
     # Current Game State
-    already_pop = True  # Boolean to make sure d press only deletes 1 Op
+    already_pop = False  # Boolean to make sure d press only deletes 1 Op
     banana_points = 0
 
     # main loop
@@ -145,7 +155,6 @@ def main(argv=None):
             ############
 
             avatar.update()
-            avatar.update_image()
             
             # input handling
             for event in pygame.event.get():
@@ -157,24 +166,27 @@ def main(argv=None):
                         sys.exit()
                     elif event.key == pygame.K_LEFT: # do these last!
                         if avatar.left_pos() > lvl.left:
-                            avatar.move(180, avatar.speed)
+                            avatar.move(DIR_LEFT, avatar.speed)
                     elif event.key == pygame.K_RIGHT:
                         if avatar.right_pos() < lvl.right:
-                            avatar.move(0, avatar.speed)
-                    if (event.key == pygame.K_d and already_pop
-                            and banana_points >= 1):
-                        avatar.change("bored")
-                        if len(expr) > 0:
-                            expr.pop()
-                            already_pop = False
-                            banana_points = banana_points - 1
+                            avatar.move(DIR_RIGHT, avatar.speed)
+                    if (event.key == pygame.K_d):
+                        # remove last caught coconut
+                        if (not already_pop and (banana_points >= 1 or
+                            DEBUG_PLAY)):
+                            avatar.change("throw")
+                            if len(expr) > 0:
+                                expr.pop()
+                                already_pop = True
+                                banana_points = banana_points - 1
+
                 # Key 
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
                     if event.key == pygame.K_d:
                         avatar.change("still")
-                        already_pop = True
+                        already_pop = False
                         
 
             # coconut creation
