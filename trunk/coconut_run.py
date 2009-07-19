@@ -161,7 +161,7 @@ def main(argv=None):
                     elif event.key == pygame.K_RIGHT:
                         if avatar.right_pos() < lvl.right:
                             avatar.move(0, avatar.speed)
-                    if event.key == pygame.K_d and already_pop:
+                    if event.key == pygame.K_d and already_pop and banana_points > 1:
                         avatar.change("bored")
                         if len(expr) > 0:
                             expr.pop()
@@ -170,9 +170,10 @@ def main(argv=None):
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.vel = 0.0
-                    if event.key == pygame.K_d:
+                    if event.key == pygame.K_d and banana_points > 0:
                         avatar.change("still")
                         already_pop = True
+                        banana_points = banana_points - 1
 
             # coconut creation
             if random.random() < lvl.blk_freq:
@@ -269,16 +270,6 @@ def main(argv=None):
         # draw Bananas
         screen.blit(default_font.render('     x %d' % banana_points,
             True, COLOR_BLACK), bananas_display_pos)       
-        # draw Bananas
-        
-        #screen.blit(default_font.render('Bananas:     x %d' % avatar.lives, 1,
-        #                               COLOR_BLACK), bananas_display_pos)
-        
-        # draw Points
-        
-        #screen.blit(default_font.render('Points: %d' % banana_points,
-        #    True, COLOR_BLACK), points_display_pos)
-        
         # draw Time
         screen.blit(default_font.render('Time: %d sec' % time_limit,
             True, COLOR_BLACK), time_display_pos)
