@@ -46,7 +46,12 @@ class Expr(list):
             return 0
         if self.valid():
             # calls the python eval()
-            return eval(str(self))
+            try:
+                return eval(str(self))
+            except ZeroDivisionError:
+                pass
+            except:
+                pass
         else:
             raise InvalidExpr
             

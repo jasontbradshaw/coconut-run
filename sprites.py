@@ -14,7 +14,8 @@ class Animatable:
         self.mspf = 200 # ms per frame
         self.next_time = pygame.time.get_ticks()
     def set_frames(self, state, frames):
-        # frames should be a StateMachine
+        if type(frames) != StateMachine:
+            raise TypeError("frames is not a StateMachine!")
         if type(state) == int:
             self.frames[state] = frames
         else:
@@ -26,9 +27,11 @@ class Animatable:
     def current_frames(self):
         return self.frames[self.sm.current(True)]
     def next(self):
-        # for the current state frames, move to the next frame
+        # move to the next frame of the current state, but only
+        # if it is time to do so
         current_time = pygame.time.get_ticks()
         if current_time >= self.next_time:
+            # enough time passed since last update
             self.next_time += self.mspf
             return self.current_frames().next()
     def current_surf(self):
@@ -108,6 +111,7 @@ class Avatar(Movable, Animatable):
     def update(self):
         self.vel = 0.0
         self.prev_rect = self.rect
+        self.update_image()
     
     def left_pos(self):
         return self.rect.left
