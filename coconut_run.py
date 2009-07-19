@@ -91,7 +91,9 @@ def main(argv=None):
     avatar_file = avatar_folder + 'avatar.png'
     coco1 = avatar_folder + 'pain1.png'
     coco2 = avatar_folder + 'pain2.png'
+    basket_file = icons_folder + 'basket_highres.png'
 
+    basket_surf = pygame.image.load(basket_file).convert_alpha()
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
     coco_surf1 = pygame.image.load(coco1).convert_alpha()
     coco_surf2 = pygame.image.load(coco2).convert_alpha()
@@ -100,7 +102,6 @@ def main(argv=None):
 
     avatar_sm = StateMachine(["still", "right", "left", "catch", "throw"],
             start=0)
-    avatar_rect = avatar_surf.get_rect()
     avatar_speed = 15
     avatar_lives = 5
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
@@ -265,7 +266,11 @@ def main(argv=None):
         for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
 
+        # draw avatar
+        avatar_rect = avatar.get_delta(delta)
+        basket_rect = avatar_rect.move(-10, -20)
         screen.blit(avatar.image, avatar.get_delta(delta))
+        screen.blit(basket_surf, basket_rect)
         blit_bananas_icon(screen, 1)
 
         # draw expression
