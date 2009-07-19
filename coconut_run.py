@@ -55,7 +55,6 @@ def main(argv=None):
 
     # keyboard delay before key repeats
     pygame.key.set_repeat(10, 0)
-    already_pop = True  # Boolean to make sure d press only deletes 1 Op
 
     # level
     lvl = Level(name = "Level 1",
@@ -112,13 +111,17 @@ def main(argv=None):
     
     fps_display_pos = (lvl.right - 140, 20)
     level_display_pos = (lvl.right / 2 - 50, 20)
-    lives_display_pos = (20, 20)
-    points_display_pos = (20, 50)
-    time_display_pos = (20, 80)
+    bananas_display_pos = (20, 50)
+    # points_display_pos = (20, 50)
+    time_display_pos = (20, 20)
 
     # menus
     full_screen_image(backdrops_folder + "main_menu.png")
     game_over = False
+    
+    # Current Game State
+    already_pop = True  # Boolean to make sure d press only deletes 1 Op
+    banana_points = 0
 
     # main loop
     logic_fps = 30
@@ -220,7 +223,7 @@ def main(argv=None):
                 if b.actionable(avatar):
                     b.collided = True   # each banana can only collide once
                     b.kill()
-                    avatar.points += 1  # avatar gains 1 point for banana
+                    banana_points += 1  # gains 1 banana point
 
             next_logic_tick += skip_ticks
             logical_loops += 1
@@ -248,7 +251,7 @@ def main(argv=None):
             screen.blit(b.image, b.get_delta(delta))
 
         screen.blit(avatar.image, avatar.get_delta(delta))
-        blit_lives_icon(screen, avatar.lives)
+        blit_bananas_icon(screen, 1)
 
         # draw expression
         expr_txt = ""
@@ -262,35 +265,40 @@ def main(argv=None):
             level_display_pos)
         # draw FPS
         screen.blit(default_font.render('FPS: %.1f' % fps, True,
-          COLOR_BLACK), fps_display_pos)
-        # draw lives
-        #screen.blit(default_font.render('Lives: %d' % avatar.lives, 1,
-        #                               COLOR_BLACK), lives_display_pos)
+            COLOR_BLACK), fps_display_pos)
+        # draw Bananas
+        screen.blit(default_font.render('     x %d' % banana_points,
+            True, COLOR_BLACK), bananas_display_pos)       
+        # draw Bananas
+        
+        #screen.blit(default_font.render('Bananas:     x %d' % avatar.lives, 1,
+        #                               COLOR_BLACK), bananas_display_pos)
+        
         # draw Points
-        screen.blit(default_font.render('Points: %d' % avatar.points,
-          True, COLOR_BLACK), points_display_pos)
+        
+        #screen.blit(default_font.render('Points: %d' % banana_points,
+        #    True, COLOR_BLACK), points_display_pos)
+        
         # draw Time
         screen.blit(default_font.render('Time: %d sec' % time_limit,
-          True, COLOR_BLACK), time_display_pos)
+            True, COLOR_BLACK), time_display_pos)
         # draw debug text
         screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq,
-          True, COLOR_BLACK), (20, 110))
+            True, COLOR_BLACK), (20, 80))
 
         pygame.display.flip()
         
 
-def blit_lives_icon(screen, lives):
-    heart_file = icons_folder + 'heart.png'
-    heart_surf = pygame.image.load(heart_file).convert_alpha()
-    heart_rect = heart_surf.get_rect()
-    heart_rect.topleft = (20, 20)
-    x = 20
-    y = 20
+def blit_bananas_icon(screen, lives):
+    banana_file = icons_folder + 'banana_highres.png'
+    banana_surf = pygame.image.load(banana_file).convert_alpha()
+    banana_rect = banana_surf.get_rect()
+    banana_rect.topleft = (20, 50)
     for i in range(lives):
         if i > 14:
             break
-        screen.blit(heart_surf, heart_rect)
-        heart_rect.move_ip(32+8, 0)
+        screen.blit(banana_surf, banana_rect)
+        banana_rect.move_ip(32+8, 0)
 
 
 def full_screen_image(img_filename):
