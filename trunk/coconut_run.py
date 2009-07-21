@@ -341,4 +341,3 @@ def randexpr(min=0, max=10, operator_freq=0.25):
 if __name__ == "__main__":
     pygame.init()
     sys.exit(main())
-event.key == pygame.K_d
