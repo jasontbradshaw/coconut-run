@@ -330,11 +330,14 @@ def full_screen_image(img_filename):
         clk.tick()
 
 
-def randexpr(min=0, max=10, operator_freq=0.25):
+def randexpr(min=0, max=10, operator_freq=0.25, unary=False):
+    ops = libcocorun.binary_optrs
+    if unary:
+        ops = libcocorun.operators
+
     if random.random() < operator_freq:
         # make operator
-        return Op(libcocorun.operators[random.randint(0,
-          len(libcocorun.operators)-1)])
+        return Op(ops[random.randint(0, len(ops)-1)])
     # return operand
     return Op(str(random.randint(min, max)))
 
