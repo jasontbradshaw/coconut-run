@@ -39,6 +39,8 @@ COLOR_WHITE = (255, 255, 255)
 # GUI window
 size = width, height = 640, 480
 screen = pygame.display.set_mode(size)
+#screen = pygame.display.set_mode(size,
+#        pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
 
 def main(argv=None):
     if argv is None:
@@ -69,7 +71,7 @@ def main(argv=None):
             blk_freq_min = 0.015,
             blk_freq_max = 0.02,
             blk_freq_inc = 0.0001,
-            min_vel = 5, max_vel = 10,
+            min_vel = 4, max_vel = 7,
             left = 0, top = 0, right = width, bottom = height - 40)
     expr = Expr()
     time_limit = lvl.time_limit
@@ -260,8 +262,14 @@ def main(argv=None):
         
         for c in coconuts:
             screen.blit(c.image, c.get_delta(delta))
-            screen.blit(expr_font.render(str(c.expr), True, COLOR_WHITE,
-              COLOR_BLACK), c.get_delta(delta))
+            if(c.expr.oprnd()):
+                num_file = 'resources/graphics/op/numbers/'
+                num_file += str(c.expr) + '.png'
+                num_surf = pygame.image.load(num_file).convert_alpha()
+                screen.blit(num_surf, c.get_delta(delta))
+            else:
+                screen.blit(expr_font.render(str(c.expr), True, COLOR_WHITE,
+                  COLOR_BLACK), c.get_delta(delta))
 
         for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
@@ -330,7 +338,7 @@ def full_screen_image(img_filename):
         clk.tick()
 
 
-def randexpr(min=0, max=10, operator_freq=0.25, unary=False):
+def randexpr(min=0, max=9, operator_freq=0.25, unary=False):
     ops = libcocorun.binary_optrs
     if unary:
         ops = libcocorun.operators
