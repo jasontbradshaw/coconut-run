@@ -5,8 +5,8 @@ class Level:
     
     def __init__(self, name = "Default", bg_file="landscape.bmp", time_limit =
             120, blk_freq_min = .015, blk_freq_max = 0.05, blk_freq_inc =
-            0.00001, min_vel = 2, max_vel = 10, left = 0, top = 0, right = 640,
-            bottom = 480, items_dropped = [True, False]):
+            0.00001, min_vel = 2, max_vel = 10, left = 0, top = 0, right = 800,
+            bottom = 600, items_dropped = [True, False]):
         
         self.name = name
         

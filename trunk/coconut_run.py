@@ -37,7 +37,7 @@ COLOR_BLACK = (0, 0, 0)
 COLOR_WHITE = (255, 255, 255)
 
 # GUI window
-size = width, height = 640, 480
+size = width, height = 800, 600
 screen = pygame.display.set_mode(size)
 #screen = pygame.display.set_mode(size,
 #        pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
@@ -65,14 +65,14 @@ def main(argv=None):
     pygame.key.set_repeat(10, 0)
 
     # level
-    lvl = Level(name = "Level 1",
-            bg_file = backdrops_folder + "landscape.png",
-            time_limit = 120,
-            blk_freq_min = 0.015,
-            blk_freq_max = 0.02,
-            blk_freq_inc = 0.0001,
-            min_vel = 4, max_vel = 7,
-            left = 0, top = 0, right = width, bottom = height - 40)
+    lvl = Level(name="Level 1",
+            bg_file=backdrops_folder + "landscape.png",
+            time_limit=120,
+            blk_freq_min=0.015,
+            blk_freq_max=0.02,
+            blk_freq_inc=0.0001,
+            min_vel=4, max_vel=7,
+            left=0, top=0, right=width, bottom=height-40)
     expr = Expr()
     time_limit = lvl.time_limit
 
