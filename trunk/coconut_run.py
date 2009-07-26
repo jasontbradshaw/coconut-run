@@ -90,29 +90,24 @@ def main(argv=None):
     banana_surf = pygame.image.load(banana_file).convert_alpha() 
 
     # set up avatar
-    avatar_file = avatar_folder + 'avatar.png'
-    coco1 = avatar_folder + 'pain1.png'
-    coco2 = avatar_folder + 'pain2.png'
     basket_file = icons_folder + 'basket_highres.png'
+    avatar_file = avatar_folder + 'still1.png'
 
     basket_surf = pygame.image.load(basket_file).convert_alpha()
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
-    coco_surf1 = pygame.image.load(coco1).convert_alpha()
-    coco_surf2 = pygame.image.load(coco2).convert_alpha()
     coco_still = StateMachine([avatar_surf])
-    coco_pain = StateMachine([coco_surf1, coco_surf2])
 
     avatar_sm = StateMachine(["still", "right", "left", "catch", "throw"],
             start=0)
-    avatar_speed = 15
+    avatar_speed = 10
     avatar_lives = 5
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0, avatar_sm)
-    avatar.set_frames(0, coco_still)
-    avatar.set_frames(1, coco_still)
-    avatar.set_frames(2, coco_still)
+    avatar.set_frames(0, build_sm("still", 1, avatar_folder))
+    avatar.set_frames(1, build_sm("right", 6, avatar_folder))
+    avatar.set_frames(2, build_sm("left", 6, avatar_folder))
     avatar.set_frames(3, coco_still)
-    avatar.set_frames(4, coco_pain)
+    avatar.set_frames(4, build_sm("scratch", 2, avatar_folder))
 
     # make groups
     coconuts = pygame.sprite.Group()
@@ -168,9 +163,11 @@ def main(argv=None):
                     if event.key == pygame.K_ESCAPE:
                         sys.exit()
                     elif event.key == pygame.K_LEFT: # do these last!
+                        avatar.change("left")
                         if avatar.left_pos() > lvl.left:
                             avatar.move(DIR_LEFT, avatar.speed)
                     elif event.key == pygame.K_RIGHT:
+                        avatar.change("right")
                         if avatar.right_pos() < lvl.right:
                             avatar.move(DIR_RIGHT, avatar.speed)
                     if (event.key == pygame.K_d):
@@ -182,10 +179,10 @@ def main(argv=None):
                                 expr.pop()
                                 already_pop = True
                                 banana_points = banana_points - 1
-
-                # Key 
+                # Key Up
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                        avatar.change("still")
                         avatar.vel = 0.0
                     if event.key == pygame.K_d:
                         avatar.change("still")
@@ -348,6 +345,19 @@ def randexpr(min=0, max=9, operator_freq=0.25, unary=False):
         return Op(ops[random.randint(0, len(ops)-1)])
     # return operand
     return Op(str(random.randint(min, max)))
+
+def build_sm(statename, num_frames=1, folder=""):
+    # builds a StateMachine animation for a given statename.
+    # This function breaks quite easily, so be careful!
+    # How to use:
+    #  if statename="dance" and num_frames=4, then we build a list
+    #  using files dance1.png, dance2.png, ...
+    anim_list = []
+    for i in range(1,num_frames+1):
+        file = folder + statename + str(i) + '.png'
+        surf = pygame.image.load(file).convert_alpha()
+        anim_list.append(surf)
+    return StateMachine(anim_list)
 
 if __name__ == "__main__":
     pygame.init()
