@@ -104,10 +104,10 @@ def main(argv=None):
     avatar = Avatar(avatar_surf, (0, lvl.bottom),
                     0, 0, avatar_speed, avatar_lives, 0, avatar_sm)
     avatar.set_frames(0, build_sm("still", 1, avatar_folder))
-    avatar.set_frames(1, build_sm("right", 6, avatar_folder))
-    avatar.set_frames(2, build_sm("left", 6, avatar_folder))
+    avatar.set_frames(1, build_sm("right", 6, avatar_folder), mspf=80)
+    avatar.set_frames(2, build_sm("left", 6, avatar_folder), mspf=80)
     avatar.set_frames(3, coco_still)
-    avatar.set_frames(4, build_sm("scratch", 2, avatar_folder))
+    avatar.set_frames(4, build_sm("scratch", 2, avatar_folder), mspf=200)
 
     # make groups
     coconuts = pygame.sprite.Group()

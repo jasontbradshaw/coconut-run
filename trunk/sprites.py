@@ -8,18 +8,23 @@ class Animatable:
     """
     list of States, each element in this list maps (via index) to:
     """
+    DEFAULT_MSPF = 100  # ms between frames
+
     def __init__(self, state_machine):
         self.sm = state_machine
         self.frames = [None]*len(self.sm) # user must set frames later
-        self.mspf = 200 # ms per frame
+        self.mspf = [Animatable.DEFAULT_MSPF]*len(self.sm) # ms between frame
         self.next_time = pygame.time.get_ticks()
-    def set_frames(self, state, frames):
+    def set_frames(self, state, frames, mspf=DEFAULT_MSPF):
         if type(frames) != StateMachine:
             raise TypeError("frames is not a StateMachine!")
         if type(state) == int:
             self.frames[state] = frames
+            self.mspf[state] = mspf
         else:
-            self.frames[self.sm.index(state)] = frames
+            i = self.sm.index(state)
+            self.frames[i] = frames
+            self.mspf[i] = mspf
     def change(self, s):
         return self.sm.change(s)
     def current(self, number=False):
@@ -32,7 +37,9 @@ class Animatable:
         current_time = pygame.time.get_ticks()
         if current_time >= self.next_time:
             # enough time passed since last update
-            self.next_time += self.mspf
+            # get the mspf for the current state
+            mspf = self.mspf[self.sm.current(True)]
+            self.next_time += mspf
             return self.current_frames().next()
     def current_surf(self):
         # for the current state frames, returns the current Surface
