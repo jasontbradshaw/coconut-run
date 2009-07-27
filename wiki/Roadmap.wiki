@@ -15,23 +15,16 @@ A rudimentary _playable_ version with crappy graphics and no interface. Basicall
  * lose lives
  * exit game when lives < 0
 
-=Milestone 2=
+=Milestone 2 - 2009.08.02=
 
-==Feature freeze on June 27, 2009==
-After June 27th, no more feature requests for Milestone 2 should be added. Set the milestone number on issues so we know what we need to work on.
+==<font color="yellow">Deadline Approaching.</font>==
 
-Add fundamental features to the game play.
+Milestone 2 build should look very close to the final game in terms of game play. Features such as menus and level designer is deferred to a later milestone. 
 
- * what is the goal of the game?
-  * just dodging coconuts is boring
-  * why is the player dodging coconuts? give the player a *motivation*
-   * need a back story
-  * how do you win?
- * scoring system - points per second
- * special drop items - life, umbrella, etc
-  * a good way to motivate players to move away from the center of the screen
- * true FPS management
-  * useful for other features such as acceleration
+ * generate goal value and earn points when values are met
+ * nice outputs of operands, operators, and formulas at bottom of screen
+ * catch coconuts, throw away coconuts, and block coconuts from being caught
+ * "accept" a formula.
 
 =Milestone 3=
  * multiple levels to choose from
