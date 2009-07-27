@@ -17,7 +17,7 @@ A rudimentary _playable_ version with crappy graphics and no interface. Basicall
 
 =Milestone 2 - 2009.08.02=
 
-==<font color="yellow">Deadline Approaching.</font>==
+==<font color="orange">Deadline Approaching.</font>==
 
 Milestone 2 build should look very close to the final game in terms of game play. Features such as menus and level designer is deferred to a later milestone. 
 
