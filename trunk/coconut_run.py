@@ -68,8 +68,8 @@ def main(argv=None):
     lvl = Level(name="Level 1",
             bg_file=backdrops_folder + "landscape.png",
             time_limit=120,
-            blk_freq_min=0.015,
-            blk_freq_max=0.02,
+            blk_freq_min=0.0,
+            blk_freq_max=0.05,
             blk_freq_inc=0.0001,
             min_vel=4, max_vel=7,
             left=0, top=0, right=width, bottom=height-40)
@@ -101,9 +101,15 @@ def main(argv=None):
             start=0)
     avatar_speed = 10
     avatar_lives = 5
-    avatar = Avatar(avatar_surf, (0, lvl.bottom),
-                    0, 0, avatar_speed, avatar_lives, 0, avatar_sm)
-    avatar.set_frames(0, build_sm("still", 1, avatar_folder))
+    avatar_collision_rect = avatar_surf.get_rect()
+    avatar_collision_rect.width = 32
+    avatar_collision_bottomleft = (32, lvl.bottom)
+    avatar = Avatar(avatar_surf, image_bottomleft=(0, lvl.bottom),
+            collision_rect=avatar_collision_rect,
+            collision_bottomleft=avatar_collision_bottomleft,
+            dir=0, vel=0, speed=avatar_speed,
+            lives=avatar_lives, points=0, states=avatar_sm)
+    avatar.set_frames(0, build_sm("scratch", 2, avatar_folder))
     avatar.set_frames(1, build_sm("right", 6, avatar_folder), mspf=80)
     avatar.set_frames(2, build_sm("left", 6, avatar_folder), mspf=80)
     avatar.set_frames(3, coco_still)
@@ -274,7 +280,7 @@ def main(argv=None):
         # draw avatar
         avatar_rect = avatar.get_delta(delta)
         basket_rect = avatar_rect.move(-10, -20)
-        screen.blit(avatar.image, avatar.get_delta(delta))
+        screen.blit(avatar.image, avatar_rect)
         screen.blit(basket_surf, basket_rect)
         blit_bananas_icon(screen, 1)
 
