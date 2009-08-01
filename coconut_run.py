@@ -33,6 +33,7 @@ COLOR_BLACK = (0, 0, 0)
 COLOR_WHITE = (255, 255, 255)
 COLOR_BLUE = pygame.Color(0x00, 0xaa, 0xcc, 128)
 COLOR_RED = pygame.Color(0xff, 0x00, 0x00, 128)
+COLOR_GREEN = pygame.Color(0x00, 0xff, 0x00, 128)
 
 # GUI window
 size = width, height = 800, 600
@@ -191,16 +192,15 @@ def main(argv=None):
                     if event.key == pygame.K_d:
                         avatar.change("still")
                         already_pop = False
-                        
 
-            # coconut creation
+            # create coconut
             if random.random() < lvl.blk_freq:
                 speed = random.uniform(lvl.min_vel, lvl.max_vel)
                 c = (Coconut(coconut_surf, [random.randint(lvl.left, lvl.right),
                     lvl.top], DIR_DOWN, speed, speed, lvl.bottom,
                     timeout=DEFAULT_TIMEOUT, expr=randexpr()))
                 coconuts.add(c)
-            # banana creation
+            # create banana
             if random.random() < lvl.blk_freq:
                 speed = random.uniform(lvl.min_vel, lvl.max_vel)
                 b = (Banana(banana_surf, [random.randint(lvl.left, lvl.right),
@@ -264,9 +264,7 @@ def main(argv=None):
         for c in coconuts:
             screen.blit(c.image, c.get_delta(delta))
             if DEBUG_PLAY:
-                points = [c.rect.topleft, c.rect.topright,
-                        c.rect.bottomright, c.rect.bottomleft]
-                pygame.gfxdraw.filled_polygon(screen, points, COLOR_RED)
+                debug_draw_rect(screen, c.rect, COLOR_RED)
             if(c.expr.oprnd()):
                 num_file = 'resources/graphics/op/numbers/'
                 num_file += str(c.expr) + '.png'
@@ -279,9 +277,7 @@ def main(argv=None):
         for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
             if DEBUG_PLAY:
-                points = [b.rect.topleft, b.rect.topright,
-                        b.rect.bottomright, b.rect.bottomleft]
-                pygame.gfxdraw.filled_polygon(screen, points, COLOR_BLUE)
+                debug_draw_rect(screen, b.rect, COLOR_GREEN)
 
         # draw avatar
         avatar_rect = avatar.get_delta(delta)
@@ -291,9 +287,7 @@ def main(argv=None):
         blit_bananas_icon(screen, 1)
 
         if DEBUG_PLAY:
-            points = [avatar.rect.topleft, avatar.rect.topright,
-                    avatar.rect.bottomright, avatar.rect.bottomleft]
-            pygame.gfxdraw.filled_polygon(screen, points, COLOR_BLUE)
+            debug_draw_rect(screen, avatar.rect, COLOR_BLUE)
 
         # draw expression
         expr_txt = ""
@@ -374,6 +368,12 @@ def build_sm(statename, num_frames=1, folder=""):
         surf = pygame.image.load(file).convert_alpha()
         anim_list.append(surf)
     return StateMachine(anim_list)
+
+def debug_draw_rect(screen, rect, color):
+    points = [rect.topleft, rect.topright,
+            rect.bottomright, rect.bottomleft]
+    pygame.gfxdraw.filled_polygon(screen, points, color)
+
 
 if __name__ == "__main__":
     pygame.init()
