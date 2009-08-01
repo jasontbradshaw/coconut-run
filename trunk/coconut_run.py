@@ -11,7 +11,6 @@ from libcocorun import Expr, Op
 import libcocorun
 
 # constants
-COLORKEY = 0xFF00FF # transparent color
 DIR_RIGHT = 0
 DIR_DOWN = 90
 DIR_LEFT = 180
@@ -169,12 +168,12 @@ def main(argv=None):
                         sys.exit()
                     elif event.key == pygame.K_LEFT: # do these last!
                         avatar.change("left")
-                        if avatar.left_pos() > lvl.left:
-                            avatar.move(DIR_LEFT, avatar.speed)
+                        #if avatar.left_pos() > lvl.left:
+                            #avatar.move(DIR_LEFT, avatar.speed)
                     elif event.key == pygame.K_RIGHT:
                         avatar.change("right")
-                        if avatar.right_pos() < lvl.right:
-                            avatar.move(DIR_RIGHT, avatar.speed)
+                        #if avatar.right_pos() < lvl.right:
+                            #avatar.move(DIR_RIGHT, avatar.speed)
                     if (event.key == pygame.K_d):
                         # remove last caught coconut
                         if (not already_pop and (banana_points >= 1 or

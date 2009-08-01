@@ -4,6 +4,11 @@ import copy
 from libcocorun import Expr
 from game import StateMachine
 
+DIR_RIGHT = 0
+DIR_DOWN = 90
+DIR_LEFT = 180
+DIR_UP = 270
+
 class Animatable:
     """
     Provides sprites with an animation framework.
@@ -157,6 +162,14 @@ class Avatar(Movable, Animatable):
         self.next()
 
     def update(self):
+        if self.sm.current() == "still":
+            self.vel = 0.0
+        elif self.sm.current() == "left":
+            self.move(DIR_LEFT, avatar.speed)
+        elif self.sm.current() == "right":
+            self.move(DIR_RIGHT, avatar.speed)
+        elif self.sm.current() == "scratch":
+
         self.vel = 0.0      # stop delta avatar movement
         self.prev_rect = copy.deepcopy(self.image_rect)
         self.update_image()
