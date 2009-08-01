@@ -1,17 +1,13 @@
 import sys
 import pygame
+import pygame.gfxdraw
 import random
 import math
 import copy
 
-from sprites import Droppable
-from sprites import Avatar
-from sprites import Coconut
-from sprites import Banana
-from game import Level
-from game import StateMachine
-from libcocorun import Expr
-from libcocorun import Op
+from sprites import Droppable, Avatar, Coconut, Banana
+from game import Level, StateMachine
+from libcocorun import Expr, Op
 import libcocorun
 
 # constants
@@ -35,6 +31,8 @@ fonts_folder = resource_folder + 'fonts/'
 
 COLOR_BLACK = (0, 0, 0)
 COLOR_WHITE = (255, 255, 255)
+COLOR_BLUE = pygame.Color(0x00, 0xaa, 0xcc, 128)
+COLOR_RED = pygame.Color(0xff, 0x00, 0x00, 128)
 
 # GUI window
 size = width, height = 800, 600
@@ -102,14 +100,14 @@ def main(argv=None):
     avatar_speed = 10
     avatar_lives = 5
     avatar_collision_rect = avatar_surf.get_rect()
-    avatar_collision_rect.width = 32
-    avatar_collision_bottomleft = (32, lvl.bottom)
+    avatar_collision_rect.width = 24
+    avatar_collision_bottomleft = (32+4, lvl.bottom)
     avatar = Avatar(avatar_surf, image_bottomleft=(0, lvl.bottom),
             collision_rect=avatar_collision_rect,
             collision_bottomleft=avatar_collision_bottomleft,
             dir=0, vel=0, speed=avatar_speed,
             lives=avatar_lives, points=0, states=avatar_sm)
-    avatar.set_frames(0, build_sm("scratch", 2, avatar_folder))
+    avatar.set_frames(0, build_sm("scratch", 2, avatar_folder), mspf=300)
     avatar.set_frames(1, build_sm("right", 6, avatar_folder), mspf=80)
     avatar.set_frames(2, build_sm("left", 6, avatar_folder), mspf=80)
     avatar.set_frames(3, coco_still)
@@ -265,6 +263,10 @@ def main(argv=None):
         
         for c in coconuts:
             screen.blit(c.image, c.get_delta(delta))
+            if DEBUG_PLAY:
+                points = [c.rect.topleft, c.rect.topright,
+                        c.rect.bottomright, c.rect.bottomleft]
+                pygame.gfxdraw.filled_polygon(screen, points, COLOR_RED)
             if(c.expr.oprnd()):
                 num_file = 'resources/graphics/op/numbers/'
                 num_file += str(c.expr) + '.png'
@@ -276,13 +278,22 @@ def main(argv=None):
 
         for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
+            if DEBUG_PLAY:
+                points = [b.rect.topleft, b.rect.topright,
+                        b.rect.bottomright, b.rect.bottomleft]
+                pygame.gfxdraw.filled_polygon(screen, points, COLOR_BLUE)
 
         # draw avatar
         avatar_rect = avatar.get_delta(delta)
-        basket_rect = avatar_rect.move(-10, -20)
+        basket_rect = avatar_rect.move(24, -20)
         screen.blit(avatar.image, avatar_rect)
         screen.blit(basket_surf, basket_rect)
         blit_bananas_icon(screen, 1)
+
+        if DEBUG_PLAY:
+            points = [avatar.rect.topleft, avatar.rect.topright,
+                    avatar.rect.bottomright, avatar.rect.bottomleft]
+            pygame.gfxdraw.filled_polygon(screen, points, COLOR_BLUE)
 
         # draw expression
         expr_txt = ""
@@ -339,7 +350,6 @@ def full_screen_image(img_filename):
         pygame.display.flip()
         clk = pygame.time.Clock()
         clk.tick()
-
 
 def randexpr(min=0, max=9, operator_freq=0.25, unary=False):
     ops = libcocorun.binary_optrs
