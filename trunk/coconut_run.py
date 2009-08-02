@@ -108,7 +108,7 @@ def main(argv=None):
             collision_bottomleft=avatar_collision_bottomleft,
             dir=0, vel=0, speed=avatar_speed,
             lives=avatar_lives, points=0, states=avatar_sm)
-    avatar.set_frames(0, build_sm("scratch", 2, avatar_folder), mspf=300)
+    avatar.set_frames(0, build_sm("still", 1, avatar_folder), mspf=300)
     avatar.set_frames(1, build_sm("right", 6, avatar_folder), mspf=80)
     avatar.set_frames(2, build_sm("left", 6, avatar_folder), mspf=80)
     avatar.set_frames(3, coco_still)

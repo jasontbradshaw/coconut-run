@@ -1,0 +1,23 @@
+How to use py2app for pygame.
+Taken from: http://svn.pythonmac.org/py2app/py2app/trunk/doc/index.html
+
+Install:
+1. setuptools: http://pypi.python.org/pypi/setuptools/
+2. easy_install:
+    $ curl -O http://peak.telecommunity.com/dist/ez_setup.py
+    $ sudo python ez_setup.py -U setuptools
+3. py2app:
+    $ sudo easy_install -U py2app
+
+Creating .app:
+1. create setup.py
+    $ py2applet --make-setup coconut_run.py
+    Wrote setup.py
+2. clean directories:
+    $ rm -rf build dist
+3. make .app w/ alias mode and tie resources in:
+    $ python setup.py py2app -A -r resources
+4. run dist/coconut_run.app
+
+Creating distributable .app:
+    $ python setup.py py2app -r resources
