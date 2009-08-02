@@ -159,6 +159,11 @@ def main(argv=None):
 
             avatar.update()
             
+            # Coco can't walk off screen
+            if (avatar.left_pos() <= lvl.left or
+                    avatar.right_pos() >= lvl.right):
+                avatar.change("still")
+
             # input handling
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -175,24 +180,22 @@ def main(argv=None):
                         if avatar.right_pos() < lvl.right:
                             avatar.change("right")
                             #avatar.move(DIR_RIGHT, avatar.speed)
-                    if event.key == pygame.K_b:
-                        DEBUG_PLAY = not DEBUG_PLAY
-                    if event.key == pygame.K_d:
+                    elif event.key == pygame.K_d:
                         # remove last caught coconut
                         if (not already_pop and (banana_points >= 1 or
                             DEBUG_PLAY)):
-                            avatar.change("throw")
                             if len(expr) > 0:
                                 expr.pop()
                                 already_pop = True
                                 banana_points = banana_points - 1
+                    elif event.key == pygame.K_b:
+                        DEBUG_PLAY = not DEBUG_PLAY
                 # Key Up
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         avatar.change("still")
                         avatar.vel = 0.0
                     if event.key == pygame.K_d:
-                        avatar.change("still")
                         already_pop = False
 
             # create coconut
