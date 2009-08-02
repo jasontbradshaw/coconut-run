@@ -100,8 +100,9 @@ def main(argv=None):
     avatar_speed = 10
     avatar_lives = 5
     avatar_collision_rect = avatar_surf.get_rect()
-    avatar_collision_rect.width = 24
-    avatar_collision_bottomleft = (32+4, lvl.bottom)
+    avatar_collision_rect.width = 20
+    avatar_collision_rect.height = 10
+    avatar_collision_bottomleft = (32+5, lvl.bottom-60)
     avatar = Avatar(avatar_surf, image_bottomleft=(0, lvl.bottom),
             collision_rect=avatar_collision_rect,
             collision_bottomleft=avatar_collision_bottomleft,
@@ -167,14 +168,16 @@ def main(argv=None):
                     if event.key == pygame.K_ESCAPE:
                         sys.exit()
                     elif event.key == pygame.K_LEFT: # do these last!
-                        avatar.change("left")
-                        #if avatar.left_pos() > lvl.left:
+                        if avatar.left_pos() > lvl.left:
+                            avatar.change("left")
                             #avatar.move(DIR_LEFT, avatar.speed)
                     elif event.key == pygame.K_RIGHT:
-                        avatar.change("right")
-                        #if avatar.right_pos() < lvl.right:
+                        if avatar.right_pos() < lvl.right:
+                            avatar.change("right")
                             #avatar.move(DIR_RIGHT, avatar.speed)
-                    if (event.key == pygame.K_d):
+                    if event.key == pygame.K_b:
+                        DEBUG_PLAY = not DEBUG_PLAY
+                    if event.key == pygame.K_d:
                         # remove last caught coconut
                         if (not already_pop and (banana_points >= 1 or
                             DEBUG_PLAY)):
@@ -220,6 +223,7 @@ def main(argv=None):
                     coconuts, False)
             for c in coconuts_collide_list:
                 if c.actionable(avatar):
+                    c.kill()
                     Channel = hit_sound.play()
                     print("Hit Coconut w/ expression: " + str(c.expr))
                     expr.append(c.expr)
@@ -227,9 +231,7 @@ def main(argv=None):
                     try:
                         print(str(expr) + " = " + str(expr.eval()))
                     except: pass
-                    if avatar.lives > 0:
-                        pass # don't lose lives
-                    else:
+                    if False:
                         # go to game over screen and quit
                         bg_music.fadeout(3000)
                         full_screen_image(backdrops_folder + "game_over.png")

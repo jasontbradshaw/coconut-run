@@ -162,13 +162,12 @@ class Avatar(Movable, Animatable):
         self.next()
 
     def update(self):
-        if self.sm.current() == "still":
-            self.vel = 0.0
-        elif self.sm.current() == "left":
-            self.move(DIR_LEFT, avatar.speed)
+        if self.sm.current() == "left":
+            self.move(DIR_LEFT, self.speed)
         elif self.sm.current() == "right":
-            self.move(DIR_RIGHT, avatar.speed)
-        elif self.sm.current() == "scratch":
+            self.move(DIR_RIGHT, self.speed)
+        else:
+            self.vel = 0.0
 
         self.vel = 0.0      # stop delta avatar movement
         self.prev_rect = copy.deepcopy(self.image_rect)
@@ -176,10 +175,12 @@ class Avatar(Movable, Animatable):
     
 class Droppable(Movable):
 
-    def __init__(self, surface, image_bottomleft=(0, 0), dir=0, vel=0, speed=0,
-                 ground_lvl=0, timeout=-1):
+    def __init__(self, surface, image_bottomleft=(0, 0),
+            collision_rect=None, collision_bottomleft=(0,0),
+            dir=0, vel=0, speed=0, ground_lvl=0, timeout=-1):
+
         Movable.__init__(self, surface, image_bottomleft,
-                None, image_bottomleft, dir, vel, speed)
+                collision_rect, collision_bottomleft, dir, vel, speed)
         
         self.ground_lvl = ground_lvl
         
@@ -230,10 +231,13 @@ class Droppable(Movable):
         
 class Coconut(Droppable):
      
-    def __init__(self, surface, init_pos, dir = 0, vel = 0, speed = 0,
-            ground_lvl = 0, timeout=-1, expr = Expr()):
-        Droppable.__init__(self, surface, init_pos, dir, vel, speed,
-                ground_lvl, timeout)
+    def __init__(self, surface, init_pos, dir=0, vel=0, speed=0,
+            ground_lvl=0, timeout=-1, expr=Expr()):
+
+        r = surface.get_rect().inflate(-20, -20)
+        collision_rect_pos = (init_pos[0] + 10, init_pos[1] - 10)
+        Droppable.__init__(self, surface, init_pos, r, collision_rect_pos,
+                dir, vel, speed, ground_lvl, timeout)
         self.expr = expr
 
     def value(self):
@@ -246,22 +250,29 @@ class Coconut(Droppable):
         """
         Returns True if:
         1) Coconut and Avatar have collided (assumed).
-        2) Coconut is touching the top half of Avatar.
-        3) Has not collided before.
+        2) Has not collided before.
+        3) Coconut is on top of Avatar.
         """
-        if (self.rect.bottom >= avatar.rect.top and not self.collided and
-                self.rect.bottom < (avatar.rect.top + avatar.rect.height/2)):
+        if self.rect.bottom >= avatar.rect.top and not self.collided:
             return True
         return False
 
 class Banana(Droppable):
 
+    def __init__(self, surface, init_pos, dir=0, vel=0, speed=0,
+            ground_lvl=0, timeout=-1, expr=Expr()):
+
+        r = surface.get_rect().inflate(-20, -20)
+        collision_rect_pos = (init_pos[0] + 12, init_pos[1] - 3)
+        Droppable.__init__(self, surface, init_pos, r, collision_rect_pos,
+                dir, vel, speed, ground_lvl, timeout)
+
     def actionable(self, avatar):
         """
         Returns True if:
         1) Banana and Avatar have collided (assumed).
-        2) Banana is not on ground.
-        3) Has not collided before.
+        2) Has not collided before.
+        3) Banana is on top of Avatar.
         """
         if not self.on_ground() and not self.collided:
             return True
