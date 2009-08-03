@@ -1,9 +1,11 @@
 import random
 import math
+import re
 
 binary_optrs = ['+', '-', '*', '/', '**', '%']
 unary_optrs = ['math.sin', 'math.exp', 'math.log']
 operators = binary_optrs + unary_optrs
+regex_num = re.compile('^0?[1-9]+$')    # a non-neg number
 
 class Op(str):
     """
@@ -12,12 +14,9 @@ class Op(str):
     """
 
     def oprnd(self):
+        #if self == regex_num.match(self).group()
+        #    return True
         return self not in operators
-        # TODO: use regular expressions so we can take decimal numbers
-        """for c in self:
-            if c < '0' or c > '9':
-                return False
-        return True"""
 
     def optr(self):
         return self in operators
