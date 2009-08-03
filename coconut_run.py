@@ -4,11 +4,14 @@ import pygame.gfxdraw
 import random
 import math
 import copy
+import os.path
 
 from sprites import Droppable, Avatar, Coconut, Banana
 from game import Level, StateMachine
 from libcocorun import Expr, Op
 import libcocorun
+
+pygame.init()
 
 # constants
 DIR_RIGHT = 0
@@ -18,15 +21,17 @@ DIR_UP = 270
 
 DEFAULT_TIMEOUT = 3000
 
-resource_folder = 'resources/'
-audio_folder = resource_folder + 'audio/'
-graphics_folder = resource_folder + 'graphics/'
-avatar_folder = graphics_folder + 'avatar/'
-backdrops_folder = graphics_folder + 'backdrops/'
-droppable_folder = graphics_folder + 'droppable/'
-icons_folder = graphics_folder + 'icons/'
-items_folder = graphics_folder + 'items/'
-fonts_folder = resource_folder + 'fonts/'
+resource_folder = 'resources'
+audio_folder = os.path.join(resource_folder, 'audio')
+graphics_folder = os.path.join(resource_folder, 'graphics')
+avatar_folder = os.path.join(graphics_folder, 'avatar')
+backdrops_folder = os.path.join(graphics_folder, 'backdrops')
+droppable_folder = os.path.join(graphics_folder, 'droppable')
+icons_folder = os.path.join(graphics_folder, 'icons')
+items_folder = os.path.join(graphics_folder, 'items')
+fonts_folder = os.path.join(resource_folder, 'fonts')
+oprnd_folder = os.path.join(graphics_folder, 'op', 'numbers')
+optr_folder = os.path.join(graphics_folder, 'op', 'operators')
 
 COLOR_BLACK = (0, 0, 0)
 COLOR_WHITE = (255, 255, 255)
@@ -40,6 +45,17 @@ screen = pygame.display.set_mode(size)
 #screen = pygame.display.set_mode(size,
 #        pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
 
+
+# text
+default_font = pygame.font.Font(os.path.join(fonts_folder, "anmari.ttf"), 26)
+large_font = pygame.font.Font(os.path.join(fonts_folder, "anmari.ttf"), 60)
+expr_font = pygame.font.Font(os.path.join(fonts_folder,
+    "Justus-Roman.ttf"), 26)
+
+def to_pygame(p):
+    """Small hack to convert pymunk to pygame coordinates"""
+    return int(p.x), int(-p.y+600)
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
@@ -51,10 +67,8 @@ def main(argv=None):
             print "DEBUG_PLAY set."
 
     # resources
-    #coconut_file = droppable_folder + 'coconut.png'
-    coconut_file = icons_folder + 'coconut_highres.png'
-    #banana_file = droppable_folder + 'banana.png'
-    banana_file = icons_folder + 'banana_highres.png'
+    coconut_file = os.path.join(icons_folder, 'coconut_highres.png')
+    banana_file = os.path.join(icons_folder, 'banana_highres.png')
 
     # clock, for fps info and timing
     clk = pygame.time.Clock()
@@ -64,21 +78,22 @@ def main(argv=None):
 
     # level
     lvl = Level(name="Level 1",
-            bg_file=backdrops_folder + "landscape.png",
-            time_limit=120,
+            bg_file=os.path.join(backdrops_folder, "landscape.png"),
+            time_limit=20,
             blk_freq_min=0.0,
             blk_freq_max=0.05,
             blk_freq_inc=0.0001,
             min_vel=4, max_vel=7,
-            left=0, top=0, right=width, bottom=height-40)
+            left=0, top=0, right=width, bottom=height-100)
     expr = Expr()
     time_limit = lvl.time_limit
 
     #initialize mixer/music/sounds
     pygame.mixer.pre_init(44100, -16, 2, 512)
     pygame.mixer.init()
-    bg_music = pygame.mixer.Sound(audio_folder + 'sample_music.ogg')
-    hit_sound = pygame.mixer.Sound(audio_folder + 'pop2.wav')
+    bg_music = pygame.mixer.Sound(os.path.join(audio_folder,
+        'sample_music.ogg'))
+    hit_sound = pygame.mixer.Sound(os.path.join(audio_folder, 'pop2.wav'))
     
     channel = bg_music.play()
     
@@ -88,10 +103,8 @@ def main(argv=None):
     banana_surf = pygame.image.load(banana_file).convert_alpha() 
 
     # set up avatar
-    basket_file = icons_folder + 'basket_highres.png'
-    avatar_file = avatar_folder + 'still1.png'
+    avatar_file = os.path.join(avatar_folder, 'still1.png')
 
-    basket_surf = pygame.image.load(basket_file).convert_alpha()
     avatar_surf = pygame.image.load(avatar_file).convert_alpha()
     coco_still = StateMachine([avatar_surf])
 
@@ -117,19 +130,15 @@ def main(argv=None):
     # make groups
     coconuts = pygame.sprite.Group()
     bananas = pygame.sprite.Group()
-
-    # text
-    default_font = pygame.font.Font(fonts_folder + "anmari.ttf", 26)
-    expr_font = pygame.font.Font(fonts_folder + "Justus-Roman.ttf", 26)
     
     fps_display_pos = (lvl.right - 140, 20)
     level_display_pos = (lvl.right / 2 - 50, 20)
     bananas_display_pos = (20, 50)
     # points_display_pos = (20, 50)
-    time_display_pos = (20, 20)
+    time_display_pos = (width/2 - 50, 20)
 
     # menus
-    full_screen_image(backdrops_folder + "main_menu.png")
+    full_screen_image(os.path.join(backdrops_folder, "main_menu.png"))
     game_over = False
     
     # Current Game State
@@ -148,7 +157,6 @@ def main(argv=None):
     clk.tick() # Allows the seconds passed to be calculated
 
     while not game_over:
-
         logical_loops = 0
         while (pygame.time.get_ticks() > next_logic_tick and
                 logical_loops < max_frameskip):
@@ -201,9 +209,9 @@ def main(argv=None):
             # create coconut
             if random.random() < lvl.blk_freq:
                 speed = random.uniform(lvl.min_vel, lvl.max_vel)
-                c = (Coconut(coconut_surf, [random.randint(lvl.left, lvl.right),
-                    lvl.top], DIR_DOWN, speed, speed, lvl.bottom,
-                    timeout=DEFAULT_TIMEOUT, expr=randexpr()))
+                c = (Coconut(coconut_surf, (random.randint(lvl.left,
+                    lvl.right), lvl.top), DIR_DOWN, speed, speed,
+                    lvl.bottom, timeout=DEFAULT_TIMEOUT, expr=randexpr()))
                 coconuts.add(c)
             # create banana
             if random.random() < lvl.blk_freq:
@@ -255,7 +263,7 @@ def main(argv=None):
         # DRAWING  #
         ############
 
-        time_limit = time_limit - ( clk.tick() * .001 )
+        time_limit = time_limit - ( clk.tick(60) * .001 )
         fps = clk.get_fps()
 
         delta = ((1.0 * pygame.time.get_ticks() + skip_ticks - next_logic_tick)
@@ -269,15 +277,8 @@ def main(argv=None):
             screen.blit(c.image, c.get_delta(delta))
             if DEBUG_PLAY:
                 debug_draw_rect(screen, c.rect, COLOR_RED)
-            if(c.expr.oprnd()):
-                num_file = 'resources/graphics/op/numbers/'
-                num_file += str(c.expr) + '.png'
-                num_surf = pygame.image.load(num_file).convert_alpha()
-                screen.blit(num_surf, c.get_delta(delta))
-            else:
-                screen.blit(expr_font.render(str(c.expr), True, COLOR_WHITE,
-                  COLOR_BLACK), c.get_delta(delta))
-
+            op_surf = pygame.image.load(op_file(c.expr)).convert_alpha()
+            screen.blit(op_surf, c.get_delta(delta))
         for b in bananas:
             screen.blit(b.image, b.get_delta(delta))
             if DEBUG_PLAY:
@@ -285,9 +286,7 @@ def main(argv=None):
 
         # draw avatar
         avatar_rect = avatar.get_delta(delta)
-        basket_rect = avatar_rect.move(24, -20)
         screen.blit(avatar.image, avatar_rect)
-        screen.blit(basket_surf, basket_rect)
         blit_bananas_icon(screen, 1)
 
         if DEBUG_PLAY:
@@ -299,32 +298,63 @@ def main(argv=None):
           expr_txt += str(expr.eval()) + " = "
         expr_txt += str(expr)
         screen.blit(expr_font.render(expr_txt, True, COLOR_BLACK), (40, 450))
+        draw_expr(screen, expr)
 
         # draw Level Name
-        screen.blit(default_font.render(lvl.name, True, COLOR_BLACK),
-            level_display_pos)
-        # draw FPS
-        screen.blit(default_font.render('FPS: %.1f' % fps, True,
-            COLOR_BLACK), fps_display_pos)
+        #screen.blit(default_font.render(lvl.name, True, COLOR_BLACK),
+        #    level_display_pos)
         # draw Bananas
         screen.blit(default_font.render('     x %d' % banana_points,
             True, COLOR_BLACK), bananas_display_pos)       
         # draw Time
-        screen.blit(default_font.render('Time: %d sec' % time_limit,
+        screen.blit(large_font.render('% 3d' % time_limit,
             True, COLOR_BLACK), time_display_pos)
         # draw debug text
-        screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq,
-            True, COLOR_BLACK), (20, 80))
+        if DEBUG_PLAY:
+            screen.blit(default_font.render('FPS: %.1f' % fps, True,
+                COLOR_BLACK), fps_display_pos)
+            screen.blit(default_font.render('blk_freq: %f' % lvl.blk_freq,
+                True, COLOR_BLACK), (20, 80))
 
         pygame.display.flip()
-        
 
-def blit_bananas_icon(screen, lives):
-    banana_file = icons_folder + 'banana_highres.png'
+def draw_expr(screen, expr, rect=None):
+    if rect is None:
+        rect = pygame.Rect(40, 600-60, 32, 32)
+    for e in expr:
+        if e.oprnd() or e.optr():
+            pygame.gfxdraw.box(screen, rect, COLOR_BLUE)
+            op_surf = pygame.image.load(op_file(e)).convert_alpha()
+            screen.blit(op_surf, rect)
+            s = e
+            if e == '*':
+                s = 'x'
+            screen.blit(large_font.render(s, True, COLOR_BLACK),
+                    (rect.x, rect.y))
+            rect.left += 40
+        else:
+            draw_expr(screen, e, rect)
+
+def op_file(op):
+    if op.oprnd():
+        return os.path.join(oprnd_folder, op+'.png')
+    elif op.optr():
+        if op == '+':
+            return os.path.join(optr_folder, 'addition.png')
+        elif op == '-':
+            return os.path.join(optr_folder, 'subtraction.png')
+        elif op == '*':
+            return os.path.join(optr_folder, 'multiply.png')
+        elif op == '/':
+            return os.path.join(optr_folder, 'divide.png')
+    return os.path.join(optr_folder, 'multiplication.png')
+
+def blit_bananas_icon(screen, num):
+    banana_file = os.path.join(icons_folder, 'banana_highres.png')
     banana_surf = pygame.image.load(banana_file).convert_alpha()
     banana_rect = banana_surf.get_rect()
     banana_rect.topleft = (20, 50)
-    for i in range(lives):
+    for i in range(num):
         if i > 14:
             break
         screen.blit(banana_surf, banana_rect)
@@ -368,7 +398,7 @@ def build_sm(statename, num_frames=1, folder=""):
     #  using files dance1.png, dance2.png, ...
     anim_list = []
     for i in range(1,num_frames+1):
-        file = folder + statename + str(i) + '.png'
+        file = os.path.join(folder, statename+str(i)+'.png')
         surf = pygame.image.load(file).convert_alpha()
         anim_list.append(surf)
     return StateMachine(anim_list)
@@ -380,5 +410,4 @@ def debug_draw_rect(screen, rect, color):
 
 
 if __name__ == "__main__":
-    pygame.init()
     sys.exit(main())

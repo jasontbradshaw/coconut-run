@@ -21,3 +21,5 @@ Creating .app:
 
 Creating distributable .app:
     $ python setup.py py2app -r resources
+Optimizations
+    $ python setup.py py2app -r resources -O1
