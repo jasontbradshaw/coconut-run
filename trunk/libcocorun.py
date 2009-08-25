@@ -2,10 +2,10 @@ import random
 import math
 import re
 
-binary_optrs = ['+', '-', '*', '/', '**', '%']
+binary_optrs = ['+', '-', '*', '/']
 unary_optrs = ['math.sin', 'math.exp', 'math.log']
 operators = binary_optrs + unary_optrs
-regex_num = re.compile('^0?[1-9]+$')    # a non-neg number
+regex_num = re.compile('^(0|[1-9][0-9]*)$')    # a non-neg number
 
 class Op(str):
     """

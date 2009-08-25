@@ -40,21 +40,17 @@ COLOR_RED = pygame.Color(0xff, 0x00, 0x00, 128)
 COLOR_GREEN = pygame.Color(0x00, 0xff, 0x00, 128)
 
 # GUI window
-size = width, height = 800, 600
-screen = pygame.display.set_mode(size)
-#screen = pygame.display.set_mode(size,
+SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+screen = pygame.display.set_mode(SCREEN_SIZE)
+#screen = pygame.display.set_mode(SCREEN_SIZE,
 #        pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
-
 
 # text
 default_font = pygame.font.Font(os.path.join(fonts_folder, "anmari.ttf"), 26)
 large_font = pygame.font.Font(os.path.join(fonts_folder, "anmari.ttf"), 60)
-expr_font = pygame.font.Font(os.path.join(fonts_folder,
-    "Justus-Roman.ttf"), 26)
-
-def to_pygame(p):
-    """Small hack to convert pymunk to pygame coordinates"""
-    return int(p.x), int(-p.y+600)
+EXPR_FONT_SIZE = 32
+expr_font = pygame.font.Font(os.path.join(fonts_folder, "monaco.ttf"),
+        EXPR_FONT_SIZE)
 
 def main(argv=None):
     if argv is None:
@@ -84,7 +80,7 @@ def main(argv=None):
             blk_freq_max=0.05,
             blk_freq_inc=0.0001,
             min_vel=4, max_vel=7,
-            left=0, top=0, right=width, bottom=height-100)
+            left=0, top=0, right=SCREEN_WIDTH, bottom=SCREEN_HEIGHT-100)
     expr = Expr()
     time_limit = lvl.time_limit
 
@@ -135,7 +131,7 @@ def main(argv=None):
     level_display_pos = (lvl.right / 2 - 50, 20)
     bananas_display_pos = (20, 50)
     # points_display_pos = (20, 50)
-    time_display_pos = (width/2 - 50, 20)
+    time_display_pos = (SCREEN_WIDTH/2 - 50, 20)
 
     # menus
     full_screen_image(os.path.join(backdrops_folder, "main_menu.png"))
@@ -295,14 +291,14 @@ def main(argv=None):
         # draw expression
         expr_txt = ""
         if expr.valid():
-          expr_txt += str(expr.eval()) + " = "
+          expr_txt += str(expr.eval()) + "="
         expr_txt += str(expr)
-        screen.blit(expr_font.render(expr_txt, True, COLOR_BLACK), (40, 450))
-        draw_expr(screen, expr)
+        draw_expr(screen, expr_txt)
 
         # draw Level Name
         #screen.blit(default_font.render(lvl.name, True, COLOR_BLACK),
         #    level_display_pos)
+
         # draw Bananas
         screen.blit(default_font.render('     x %d' % banana_points,
             True, COLOR_BLACK), bananas_display_pos)       
@@ -318,22 +314,9 @@ def main(argv=None):
 
         pygame.display.flip()
 
-def draw_expr(screen, expr, rect=None):
-    if rect is None:
-        rect = pygame.Rect(40, 600-60, 32, 32)
-    for e in expr:
-        if e.oprnd() or e.optr():
-            pygame.gfxdraw.box(screen, rect, COLOR_BLUE)
-            op_surf = pygame.image.load(op_file(e)).convert_alpha()
-            screen.blit(op_surf, rect)
-            s = e
-            if e == '*':
-                s = 'x'
-            screen.blit(large_font.render(s, True, COLOR_BLACK),
-                    (rect.x, rect.y))
-            rect.left += 40
-        else:
-            draw_expr(screen, e, rect)
+def draw_expr(screen, expr):
+        screen.blit(expr_font.render(expr, True, COLOR_BLACK),
+                (SCREEN_WIDTH/2-(len(expr)*EXPR_FONT_SIZE/2), 540))
 
 def op_file(op):
     if op.oprnd():

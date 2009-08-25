@@ -1,8 +1,9 @@
 import pygame
+import re
 
 class Level:
     """Defines level settings such as difficulty."""
-    
+     
     def __init__(self, name = "Default", bg_file="landscape.bmp", time_limit =
             120, blk_freq_min = .015, blk_freq_max = 0.05, blk_freq_inc =
             0.00001, min_vel = 2, max_vel = 10, left = 0, top = 0, right = 800,
@@ -32,7 +33,39 @@ class Level:
         # items possibly dropped
         # [coconuts, bananas, ...]
         self.items_dropped = items_dropped
+    
+    @staticmethod
+    def load(file):
+        """
+        Returns a dict containing key/value pairs extracted from
+        file, a text file with the following format:
+            
+            # a comment must begin with a hash at the
+            # beginning of a line
+            key:value
+            key:value
+            ...
+        """
 
+        # regex for extracting comments
+        comment_re = re.compile('^#')
+
+        with open(file, "r") as f:
+            configs = dict()    # key/value storage
+            for line in f:
+                line = line.strip()
+                if len(line) == 0:
+                    # skip blank lines
+                    continue
+                if comment_re.search(line) is not None:
+                    # skip commented line
+                    continue
+                keyval = line.split(":")
+                print keyval
+                if len(keyval) == 2:
+                    configs[keyval[0]] = keyval[1]
+            return configs
+                
 class StateMachine(list):
     """
     Describes a set of states that one can traverse through.
