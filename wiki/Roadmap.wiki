@@ -15,7 +15,7 @@ A rudimentary _playable_ version with crappy graphics and no interface. Basicall
  * lose lives
  * exit game when lives < 0
 
-=Milestone 2 - 2009.08.02=
+=Milestone 2 - 2010.02.01=
 
 ==<font color="orange">Deadline Approaching.</font>==
 
